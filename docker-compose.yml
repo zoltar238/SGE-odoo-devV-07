@@ -19,7 +19,7 @@ services:
       # Solo para desarrollo. Comentar en produccion
       - '5432'
   odoo:
-    image: odoo:16.0
+    image: odoo:17.0
     container_name: odoo
     depends_on:
       - db
