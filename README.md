@@ -18,13 +18,13 @@ Proyecto final SGE con Odoo, Docker, Docker Compose, Git y GitHub.
 
 Inicia sesión en tu cuenta de GitHub, haz un _fork_ de [javnitram/SGE-odoo-it-yourself](https://github.com/javnitram/SGE-odoo-it-yourself) y llama al tuyo SGE-odoo-dev-**XX** (el valor correspondiente a tu número de puesto, según **los dígitos del hostname de clase**).
 
-![Fork](https://github.com/javnitram/SGE-odoo-it-yourself/assets/1954675/f6a5bdea-70f4-47a2-98a6-dd4fd4d8547d)
+![Fork](https://github.com/user-attachments/assets/a384ed5f-e5aa-4ba2-90ae-f78e09338793)
 
 ## Creación de rama de desarrollo y clonación del repositorio en local
 
 En tu repositorio, además de tener una rama _main_ o _master_, crea una rama con nombre **develop**. Esta será tu rama de desarrollo.
 
-![Branch](https://github.com/javnitram/SGE-odoo-it-yourself/assets/1954675/b5fd46e7-9214-46e2-bc04-d0b4eb0b3997)
+![Branch](https://github.com/user-attachments/assets/6ff047cd-3375-4685-a536-d6e0e557cab1)
 
 Vas a usar esa rama para desarrollar tu propio módulo de Odoo. Para ello, deberás clonar la rama en local con Visual Studio Code.
 
