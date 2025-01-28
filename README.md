@@ -75,6 +75,15 @@ Al iniciar Odoo por primera vez y configurar nuestra primera base de datos, hemo
 
 ![Odoo conf modificado y diff](https://user-images.githubusercontent.com/1954675/214678982-2358dff2-57ab-47ed-a57d-6371750c886d.png)
 
+En Git, los estados de un archivo son:
+
+- **U (Untracked)**: El archivo no está siendo rastreado por Git (nuevo y aún no agregado al repositorio).
+- **A (Added)**: El archivo ha sido agregado al área de preparación (staging area) con `git add` pero aún no confirmado (committed).
+- **M (Modified)**: El archivo ha sido modificado desde el último commit, pero no se ha agregado al área de preparación o está modificado en staging.
+- **D (Deleted)**: El archivo ha sido eliminado y Git ha detectado este cambio.
+
+Estos estados reflejan las diferencias entre el repositorio, el área de preparación y el sistema de archivos local.
+
 Este repositorio está configurado para sincronizar únicamente código y configuración, por lo que ningún _commit_ hará un _backup_ del estado de tu servidor Odoo ni del servidor de base de datos. Recuerda que un sistema de control de versiones no está para esas cosas y, por eso, se han configurado reglas específicas en ficheros _.gitignore_ en algunos directorios.
 
 ```text
@@ -92,6 +101,17 @@ __pycache__/
 ```
 
 Haz tu primer _commit_ (esto es confirmar los cambios en el repositorio local de Git) y _push_ (sincronizar cambios locales hacia el repositorio remoto, en este caso GitHub).
+
+Es posible que la primera vez debas configurar tu nombre de usuario y dirección de correo electrónico. Esto es importante porque cada Git commit utiliza esta información para firjarla de forma inmutable en los commits que empiezas a crear:
+
+```
+git config --global user.name "John Doe"
+git config --global user.email johndoe.example.com
+```
+
+Podemos hacer esta configuración sólo una vez si pasamos la opción --global, para que Git siempre use esa información para cualquier cosa que haga en ese sistema. Si deseas anular esto con un nombre o dirección de correo electrónico diferente para proyectos específicos, puedes ejecutar el comando sin la opción ```--global``` cuando estés en ese proyecto.
+
+Muchas de las herramientas GUI te ayudarán a hacer esto cuando las ejecutes por primera vez.
 
 ## Comando _odoo scaffold_
 
