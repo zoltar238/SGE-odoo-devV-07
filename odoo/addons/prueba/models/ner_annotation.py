@@ -8,7 +8,7 @@ class NerAnnotation(models.Model):
 
     start_char = fields.Integer(string="Start Character", required=True)
     end_char = fields.Integer(string="End Character", required=True)
-    entity_id = fields.Many2mayn("ner.entity", string="Entity", required=True, ondelete="cascade")
+    entity_id = fields.Many2one("ner.entity", string="Entity", required=True, ondelete="cascade")
     dataset_id = fields.Many2one("ner.dataset", string="Dataset", required=True, ondelete="cascade")
     model_id = fields.Many2one("ner.model", string="Model", required=True, ondelete="cascade")
     text_index = fields.Integer(
