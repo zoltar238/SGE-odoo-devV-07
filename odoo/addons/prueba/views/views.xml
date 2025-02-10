@@ -1,60 +1,236 @@
+<?xml version="1.0" encoding="utf-8"?>
 <odoo>
-  <data>
-    <!-- explicit list view definition -->
-<!--
-    <record model="ir.ui.view" id="prueba.list">
-      <field name="name">prueba list</field>
-      <field name="model">prueba.prueba</field>
-      <field name="arch" type="xml">
-        <tree>
-          <field name="name"/>
-          <field name="value"/>
-          <field name="value2"/>
-        </tree>
-      </field>
-    </record>
--->
 
-    <!-- actions opening views on models -->
-<!--
-    <record model="ir.actions.act_window" id="prueba.action_window">
-      <field name="name">prueba window</field>
-      <field name="res_model">prueba.prueba</field>
-      <field name="view_mode">tree,form</field>
+    <record id="view_ner_model_tree" model="ir.ui.view">
+        <field name="name">ner.model.tree</field>
+        <field name="model">ner.model</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+                <field name="language"/>
+                <field name="containing_folder"/>
+                <field name="active"/>
+            </tree>
+        </field>
     </record>
--->
-
-    <!-- server action to the one above -->
-<!--
-    <record model="ir.actions.server" id="prueba.action_server">
-      <field name="name">prueba server</field>
-      <field name="model_id" ref="model_prueba_prueba"/>
-      <field name="state">code</field>
-      <field name="code">
-        action = {
-          "type": "ir.actions.act_window",
-          "view_mode": "tree,form",
-          "res_model": model._name,
-        }
-      </field>
+    <!-- NER Model Views -->
+    <record id="view_ner_model_form" model="ir.ui.view">
+        <field name="name">ner.model.form</field>
+        <field name="model">ner.model</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="language"/>
+                            <field name="containing_folder"/>
+                            <field name="active"/>
+                        </group>
+                        <group>
+                            <field name="description"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
     </record>
--->
 
-    <!-- Top menu item -->
-<!--
-    <menuitem name="prueba" id="prueba.menu_root"/>
--->
-    <!-- menu categories -->
-<!--
-    <menuitem name="Menu 1" id="prueba.menu_1" parent="prueba.menu_root"/>
-    <menuitem name="Menu 2" id="prueba.menu_2" parent="prueba.menu_root"/>
--->
-    <!-- actions -->
-<!--
-    <menuitem name="List" id="prueba.menu_1_list" parent="prueba.menu_1"
-              action="prueba.action_window"/>
-    <menuitem name="Server to list" id="prueba" parent="prueba.menu_2"
-              action="prueba.action_server"/>
--->
-  </data>
+    <!-- NER Entity Views -->
+    <record id="view_ner_entity_tree" model="ir.ui.view">
+        <field name="name">ner.entity.tree</field>
+        <field name="model">ner.entity</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+                <field name="entity_type"/>
+                <field name="model_id" widget="many2many_tags"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_ner_entity_form" model="ir.ui.view">
+        <field name="name">ner.entity.form</field>
+        <field name="model">ner.entity</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="entity_type"/>
+                        </group>
+                        <group>
+                            <field name="model_id" widget="many2many_tags"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- NER Dataset Views -->
+    <record id="view_ner_dataset_tree" model="ir.ui.view">
+        <field name="name">ner.dataset.tree</field>
+        <field name="model">ner.dataset</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+                <field name="model_ids" widget="many2many_tags"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_ner_dataset_form" model="ir.ui.view">
+        <field name="name">ner.dataset.form</field>
+        <field name="model">ner.dataset</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                        <group>
+                            <field name="text_list" widget="ace"/>
+                            <button name="button_data_sanitizer" string="Sanitize data" type="object"
+                                    class="btn_primary"/>
+                        </group>
+                        <field name="model_ids" widget="many2many_tags"/>
+                    </group>
+                    <notebook>
+                        <page string="Annotations">
+                            <field name="annotations">
+                                <tree editable="bottom">
+                                    <field name="dataset_id"/>
+                                    <field name="model_id" domain="[('id', 'in', parent.model_ids)]"/>
+                                    <field name="text_index"/>
+                                    <field name="text_content" readonly="1"/>
+                                    <field name="start_char"/>
+                                    <field name="end_char"/>
+                                    <field name="entity_id" domain="[('model_id', '=', model_id)]"/>
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- NER Annotation Views -->
+    <record id="view_ner_annotation_kanban" model="ir.ui.view">
+        <field name="name">ner.annotation.kanban</field>
+        <field name="model">ner.annotation</field>
+        <field name="arch" type="xml">
+            <kanban default_group_by="dataset_id" clickable="True">
+                <header>
+                    <button type="object" class="btn btn-primary" name="action_on_button_click">Train with this
+                        dataset
+                    </button>
+                </header>
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="oe_kanban_card" t-att-record-id="record.id.raw" draggable="False">
+                            <group>
+                                <p>
+                                    Text:
+                                    <field name="text_content"/>
+                                    | index:
+                                    <field name="text_index"/>
+                                </p>
+                                <p>
+                                    Start:
+                                    <field name="start_char"/>
+                                    | end:
+                                    <field name="end_char"/>
+                                </p>
+                            </group>
+                        </div>
+                        <button type="object" class="btn btn-primary" name="action_on_button_click">Train with this
+                            dataset
+                        </button>
+                    </t>
+                </templates>
+                <div class="oe_kanban_controls">
+
+                </div>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- Form View for Annotations -->
+    <record id="view_ner_annotation_form" model="ir.ui.view">
+        <field name="name">ner.annotation.form</field>
+        <field name="model">ner.annotation</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <field name="dataset_id" readonly="1"/>
+                        <field name="text_index" readonly="1"/>
+                        <field name="text_content" readonly="1"/>
+                        <field name="start_char"/>
+                        <field name="end_char"/>
+                        <field name="entity_id"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+
+    <!-- Actions -->
+    <record id="action_ner_model" model="ir.actions.act_window">
+        <field name="name">NER Models</field>
+        <field name="res_model">ner.model</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <record id="action_ner_entity" model="ir.actions.act_window">
+        <field name="name">NER Entities</field>
+        <field name="res_model">ner.entity</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <record id="action_ner_dataset" model="ir.actions.act_window">
+        <field name="name">NER Datasets</field>
+        <field name="res_model">ner.dataset</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <record id="action_ner_annotation" model="ir.actions.act_window">
+        <field name="name">NER Annotations</field>
+        <field name="res_model">ner.annotation</field>
+        <field name="view_mode">kanban,form</field>
+    </record>
+
+    <!-- Menu Items -->
+    <menuitem id="menu_ner_root"
+              name="NER"
+              web_icon="prueba,static/description/icon.png"
+              sequence="10"/>
+
+    <menuitem id="menu_ner_model"
+              name="Models"
+              parent="menu_ner_root"
+              action="action_ner_model"
+              sequence="10"/>
+
+    <menuitem id="menu_ner_entity"
+              name="Entities"
+              parent="menu_ner_root"
+              action="action_ner_entity"
+              sequence="20"/>
+
+    <menuitem id="menu_ner_dataset"
+              name="Datasets"
+              parent="menu_ner_root"
+              action="action_ner_dataset"
+              sequence="30"/>
+
+    <menuitem id="menu_ner_annotation"
+              name="Annotations"
+              parent="menu_ner_root"
+              action="action_ner_annotation"
+              sequence="40"/>
+
 </odoo>

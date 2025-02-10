@@ -1,0 +1,108 @@
+import json
+import random
+import shutil
+import spacy
+from spacy.training.example import Example
+from spacy.util import minibatch
+from spacy.training import offsets_to_biluo_tags
+
+
+class NerController:
+    def __init__(self, labels, language, model_path, data_path, learn_rate, iterations, batch_size):
+        self.labels = labels
+        self.language = language
+        self.model_path = model_path
+        self.data_path = data_path
+        self.learn_rate = learn_rate
+        self.iterations = iterations
+        self.batch_size = batch_size
+
+        # Load data from json file if available
+        if data_path:
+            with open(data_path, 'r', encoding='utf-8') as file:
+                self.train_data = json.load(file)
+
+
+    def create_ner_model(self):
+        # Load the language model
+        nlp = spacy.blank(self.language)
+
+        # Add ner component
+        if "ner" not in nlp.pipe_names:
+            ner = nlp.add_pipe("ner")
+        else:
+            ner = nlp.get_pipe("ner")
+
+        # Add labels to the ner component
+        for label in self.labels:
+            ner.add_label(label)
+
+        # Train the model
+        self.data_trainer(ner, nlp)
+
+        # Save the model
+        nlp.to_disk(self.model_path)
+        print("The new data model has been created")
+
+    # Method for deleting the ner data model
+    def delete_ner_model(self):
+        shutil.rmtree(self.model_path)
+
+    # Method for training model
+    def train_ner_model(self):
+        try:
+            nlp = spacy.load(self.model_path);
+            print('model loaded successfully')
+        except OSError as e:
+            print(f'Error loading NER model: {e}')
+
+        # Add ner to pipeline if not present
+        if 'ner' not in nlp.pipe_names:
+            ner = nlp.add_pipe("ner")
+        else:
+            ner = nlp.get_pipe("ner")
+
+        # Train model
+        self.data_trainer(ner, nlp)
+
+        # Save the model
+        nlp.to_disk(self.model_path)
+        print("The new data model has been trained")
+
+    # Method for analyzing data
+    def analyze_data(self):
+        # Load the trained model
+        nlp = spacy.load(self.model_path)
+
+        # Analyze the data with the trained model
+
+        results = []
+        for data in self.train_data:
+            text = data[0]
+            doc = nlp(data.strip())
+            for ent in doc.ents:
+                print(ent.text, ent.label_)
+
+    # Method for training the model with the given data
+    def data_trainer(self, ner, model):
+        # Training configuration
+        optimizer = model.initialize()
+        optimizer.learn_rate = self.learn_rate
+        for epoch in range(self.iterations):
+            random.shuffle(self.train_data)
+            losses = {}
+            # Create example from the data
+            # Update the model with the example in batches
+            for batch in minibatch(self.train_data, size=self.batch_size):
+                # List to store examples
+                examples = []
+
+                # Create examples from the current batch of data
+                for text, annotations in batch:
+                    examples.append(Example.from_dict(model.make_doc(text), annotations))
+
+                # Update the model with the examples in the current batch
+                ner.update(examples, drop=0.5, losses=losses, sgd=optimizer)
+            # todo: export information to json file
+            print(f"Losses at epoch {epoch}: {losses}")
+

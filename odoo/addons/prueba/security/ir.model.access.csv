@@ -1,2 +1,5 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_prueba_prueba,prueba.prueba,model_prueba_prueba,base.group_user,1,1,1,1
+access_ner_model,access_ner_model,model_ner_model,base.group_user,1,1,1,1
+access_ner_entity,access_ner_entity,model_ner_entity,base.group_user,1,1,1,1
+access_ner_dataset,access_ner_dataset,model_ner_dataset,base.group_user,1,1,1,1
+access_ner_annotation,access_ner_annotation,model_ner_annotation,base.group_user,1,1,1,1
