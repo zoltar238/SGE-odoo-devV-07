@@ -8,7 +8,7 @@ from spacy.training import offsets_to_biluo_tags
 
 
 class NerController:
-    def __init__(self, labels, language, model_path, data_path, learn_rate, iterations, batch_size):
+    def __init__(self, labels, language, model_path, data_path, learn_rate, iterations, batch_size, train_data=None):
         self.labels = labels
         self.language = language
         self.model_path = model_path
@@ -16,11 +16,20 @@ class NerController:
         self.learn_rate = learn_rate
         self.iterations = iterations
         self.batch_size = batch_size
+        self.train_data = train_data  # Se asigna por defecto
 
-        # Load data from json file if available
-        if data_path:
-            with open(data_path, 'r', encoding='utf-8') as file:
-                self.train_data = json.load(file)
+        # Cargar datos desde el archivo JSON si existe
+        if data_path and os.path.exists(data_path):  # Verifica si el archivo existe
+            try:
+                with open(data_path, 'r', encoding='utf-8') as file:
+                    self.train_data = json.load(file)
+                print(f"Datos cargados correctamente desde {data_path}")
+            except (json.JSONDecodeError, IOError) as e:
+                print(f"Error al cargar el archivo JSON: {e}")
+        elif train_data:
+            print("Usando datos de entrenamiento proporcionados directamente.")
+        else:
+            print("Advertencia: No se proporcionaron datos de entrenamiento.")
 
 
     def create_ner_model(self):
@@ -78,8 +87,8 @@ class NerController:
 
         results = []
         for data in self.train_data:
-            text = data[0]
-            doc = nlp(data.strip())
+            text = data["text"]
+            doc = nlp(text.strip())
             for ent in doc.ents:
                 print(ent.text, ent.label_)
 
@@ -98,7 +107,9 @@ class NerController:
                 examples = []
 
                 # Create examples from the current batch of data
-                for text, annotations in batch:
+                for item in batch:
+                    text = item["text"]
+                    annotations = {"entities": [[start, end, label] for start, end, label, _ in item["entities"]]}  # Eliminamos el texto extraído
                     examples.append(Example.from_dict(model.make_doc(text), annotations))
 
                 # Update the model with the examples in the current batch
