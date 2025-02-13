@@ -72,72 +72,65 @@ class NerAnnotation(models.Model):
                 # Obtain all annotations
                 index = 1
                 for annotation in sorted_annotations:
+                    # **Model: add or update the model in model_info_list**
+                    # Check if the model already exists in model_info_list
+                    existing_model = next((model for model in model_info_list if model['model'] == annotation.model_id.name), None)
 
-                    # If there anre no elements in the model list, create a new one and append it
-                    if not model_info_list:
+                    if existing_model:
+                        # If the model exists and the entity is not in the list, we add it
+                        if annotation.entity_id.name not in existing_model['entities']:
+                            existing_model['entities'].append(annotation.entity_id.name)
+                    else:
+                        # If the model does not exist, create a new one with the entity
                         ner_model = {
                             "model": annotation.model_id.name,
                             "entities": [annotation.entity_id.name]
                         }
                         model_info_list.append(ner_model)
+
+                    # **Annotations: add or update the annotations in annotation_list**
+                    # Check if there's already an annotation with the same text index and model
+                    existing_annotation = next((data for data in annotation_list if data["model"] == annotation.model_id.name and data["text"] == text_list[annotation.text_index - 1]), None)
+
+                    if existing_annotation:
+                        # If the annotation exists, add the new entity to it
+                        existing_annotation["entities"].append([annotation.start_char, annotation.end_char, annotation.entity_id.name, annotation.text_content])
                     else:
-                        for model in model_info_list:
-                            if model['model'] != annotation.model_id.name:
-                                ner_model = {
-                                    "model": annotation.model_id.name,
-                                    "entities": [annotation.entity_id.name]
-                                }
-                                model_info_list.append(ner_model)
-                            elif model['model'] == annotation.model_id.name and not model['entities'].__contains__(annotation.entity_id.name):
-                                model['entities'].append(annotation.entity_id.name)
-
-                    # If there are no elements in the annotation list, create a new one and append it
-                    if not annotation_list:
+                        # If the annotation does not exist, create a new one
                         data = {
-                            #"index": annotation.text_index,
                             "model": annotation.model_id.name,
                             "text": text_list[annotation.text_index - 1],
                             "entities": [[annotation.start_char, annotation.end_char, annotation.entity_id.name, annotation.text_content]]
                         }
                         annotation_list.append(data)
-                    elif index == annotation.text_index:
-                        if annotation_list[len(annotation_list) - 1]["model"] == annotation.model_id.name:
-                            annotation_list[len(annotation_list) - 1]["entities"].append([annotation.start_char, annotation.end_char, annotation.entity_id.name, annotation.text_content])
-                        else :
-                            data = {
-                                #"index": annotation.text_index,
-                                "model": annotation.model_id.name,
-                                "text": text_list[annotation.text_index - 1],
-                                "entities": [[annotation.start_char, annotation.end_char, annotation.entity_id.name, annotation.text_content]]
-                            }
-                            annotation_list.append(data)
-                    elif index != annotation.text_index:
-                        data = {
-                            #"index": annotation.text_index,
-                            "model": annotation.model_id.name,
-                            "text": text_list[annotation.text_index - 1],
-                            "entities": [[annotation.start_char, annotation.end_char, annotation.entity_id.name, annotation.text_content]]
-                        }
-                        annotation_list.append(data)
-                        index += 1
 
-                print(model_info_list)
+                print(len(model_info_list))
+                print(len(annotation_list))
 
                 # Sort data by model name
+                model_info_list.sort(key=lambda x: x["model"])
                 annotation_list.sort(key=lambda x: x["model"])
-                splitted_annotation_list = {key: list(group) for key, group in groupby(annotation_list, key=lambda x: x["model"])}
-                # Transform dictionary to list
-                splitted_annotation_list = list(splitted_annotation_list.values())
 
-                for annotation in splitted_annotation_list:
-                    print(annotation)
-                    # Obtain labels
-                    # Todo : implement language, learn_rate, iterations and batch_size modification
-                    language = 'en'
-                    #model_path = 'odoo/addons/prueba/NER/' + annotation['model']
-                    learn_rate = 0.001
-                    iterations = 50
-                    batch_size = 10
-                    # ner = NerController(args.labels, language, model_path, None, learn_rate, iterations, batch_size)
+                split_annotation_list = {key: list(group) for key, group in groupby(annotation_list, key=lambda x: x["model"])}
+                # Transform dictionary to list
+                split_annotation_list = list(split_annotation_list.values())
+
+                # Fixed loop to match entities with model names
+                for index, annotations_group in enumerate(split_annotation_list):
+                    if annotations_group:  # Check if the group has annotations
+                        model_name = annotations_group[0]['model']
+                        # Find the matching model info
+                        matching_model = next((model for model in model_info_list if model['model'] == model_name), None)
+
+                        print(matching_model['entities'])
+                        if matching_model:
+                            labels = matching_model['entities']
+                            language = 'en'
+                            model_path = os.path.join('odoo/addons/prueba/NER/', model_name)
+                            learn_rate = 0.001
+                            iterations = 50
+                            batch_size = 10
+                            # Uncomment when NerController is implemented
+                            # ner = NerController(labels, language, model_path, None, learn_rate, iterations, batch_size)
 
             return True
