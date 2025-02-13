@@ -16,6 +16,6 @@ def english_data_sanitizer(data_list, wipe_numbers, replace_underscores, replace
     filter_pattern = '[' + ''.join(filter) + ']'
 
     # Sanitize data
-    sanitized_data_list = [re.sub(filter_pattern, ' ', item) for item in data_list]
+    sanitized_data_list = [re.sub(filter_pattern, ' ', item).strip() for item in data_list]
 
     return sanitized_data_list

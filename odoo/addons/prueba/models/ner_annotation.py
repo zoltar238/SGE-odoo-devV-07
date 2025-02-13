@@ -1,6 +1,11 @@
 from odoo import api, fields, models
 from pathlib import Path
 import os
+import json
+from itertools import groupby
+
+#from odoo.addons.prueba.controllers.ner_controller import NerController
+
 
 class NerAnnotation(models.Model):
     _name = "ner.annotation"
@@ -42,19 +47,97 @@ class NerAnnotation(models.Model):
                 else:
                     rec.text_content = "Text index out of bounds"
 
-    @api.depends('model_id.name', 'model_id.containing_folder')
-    def action_on_button_click(self):
-        for rec in self:
-            if rec.model_id:  # Verificamos que model_id existe
-                folder = rec.model_id.containing_folder
-                model_name = rec.model_id.name
-                print(f"Folder: {folder}")
-                print(f"Model name: {model_name}")
 
-                path = os.path.join(folder, model_name)
-                if os.path.exists(path):
-                    print(f"El archivo {model_name} existe en la carpeta {folder}")
-                else:
-                    print("Botón presionado!")
-            else:
-                print("No hay modelo seleccionado.")
+    @api.depends('model_id.name', 'model_id.containing_folder', 'dataset_id.text_list')
+    def action_on_button_click(self):
+        self.ensure_one()
+        for rec in self:
+            if self.dataset_id:
+                # Obtener todas las anotaciones del dataset
+                annotations = self.env['ner.annotation'].search([
+                    ('dataset_id', '=', self.dataset_id.id)
+                ])
+
+                # Split text into list
+                if rec.dataset_id.text_list:
+                    text_list = rec.dataset_id.text_list.split('\n')
+
+                # Sort the list by index order
+                sorted_annotations = annotations.sorted(key=lambda r: (r.text_index, r.model_id.name))
+
+                # List to hold all the annotations
+                annotation_list = []
+                model_info_list = []
+
+                # Obtain all annotations
+                index = 1
+                for annotation in sorted_annotations:
+
+                    # If there anre no elements in the model list, create a new one and append it
+                    if not model_info_list:
+                        ner_model = {
+                            "model": annotation.model_id.name,
+                            "entities": [annotation.entity_id.name]
+                        }
+                        model_info_list.append(ner_model)
+                    else:
+                        for model in model_info_list:
+                            if model['model'] != annotation.model_id.name:
+                                ner_model = {
+                                    "model": annotation.model_id.name,
+                                    "entities": [annotation.entity_id.name]
+                                }
+                                model_info_list.append(ner_model)
+                            elif model['model'] == annotation.model_id.name and not model['entities'].__contains__(annotation.entity_id.name):
+                                model['entities'].append(annotation.entity_id.name)
+
+                    # If there are no elements in the annotation list, create a new one and append it
+                    if not annotation_list:
+                        data = {
+                            #"index": annotation.text_index,
+                            "model": annotation.model_id.name,
+                            "text": text_list[annotation.text_index - 1],
+                            "entities": [[annotation.start_char, annotation.end_char, annotation.entity_id.name, annotation.text_content]]
+                        }
+                        annotation_list.append(data)
+                    elif index == annotation.text_index:
+                        if annotation_list[len(annotation_list) - 1]["model"] == annotation.model_id.name:
+                            annotation_list[len(annotation_list) - 1]["entities"].append([annotation.start_char, annotation.end_char, annotation.entity_id.name, annotation.text_content])
+                        else :
+                            data = {
+                                #"index": annotation.text_index,
+                                "model": annotation.model_id.name,
+                                "text": text_list[annotation.text_index - 1],
+                                "entities": [[annotation.start_char, annotation.end_char, annotation.entity_id.name, annotation.text_content]]
+                            }
+                            annotation_list.append(data)
+                    elif index != annotation.text_index:
+                        data = {
+                            #"index": annotation.text_index,
+                            "model": annotation.model_id.name,
+                            "text": text_list[annotation.text_index - 1],
+                            "entities": [[annotation.start_char, annotation.end_char, annotation.entity_id.name, annotation.text_content]]
+                        }
+                        annotation_list.append(data)
+                        index += 1
+
+                print(model_info_list)
+
+                # Sort data by model name
+                annotation_list.sort(key=lambda x: x["model"])
+                splitted_annotation_list = {key: list(group) for key, group in groupby(annotation_list, key=lambda x: x["model"])}
+                # Transform dictionary to list
+                splitted_annotation_list = list(splitted_annotation_list.values())
+
+                for annotation in splitted_annotation_list:
+                    print(annotation)
+                    # Obtain labels
+                    # Todo : implement language, learn_rate, iterations and batch_size modification
+                    language = 'en'
+                    #model_path = 'odoo/addons/prueba/NER/' + annotation['model']
+                    learn_rate = 0.001
+                    iterations = 50
+                    batch_size = 10
+                    # ner = NerController(args.labels, language, model_path, None, learn_rate, iterations, batch_size)
+
+            return True
