@@ -3,8 +3,7 @@ from pathlib import Path
 import os
 import json
 from itertools import groupby
-
-#from odoo.addons.prueba.controllers.ner_controller import NerController
+from odoo.addons.prueba.controllers.ner_controller import NerController
 
 
 class NerAnnotation(models.Model):
@@ -15,7 +14,7 @@ class NerAnnotation(models.Model):
     end_char = fields.Integer(string="End Character", required=True)
     entity_id = fields.Many2one("ner.entity", string="Entity", required=True, ondelete="cascade")
     dataset_id = fields.Many2one("ner.dataset", string="Dataset", required=True, ondelete="cascade")
-    model_id = fields.Many2one("ner.model", string="Model", required=True, ondelete="cascade")
+    model_id = fields.Many2one("ner.model", string="Model", required=True, ondelete="set null")
     text_index = fields.Integer(
         string="Text Index",
         required=True,
@@ -70,7 +69,6 @@ class NerAnnotation(models.Model):
                 model_info_list = []
 
                 # Obtain all annotations
-                index = 1
                 for annotation in sorted_annotations:
                     # **Model: add or update the model in model_info_list**
                     # Check if the model already exists in model_info_list
@@ -84,7 +82,8 @@ class NerAnnotation(models.Model):
                         # If the model does not exist, create a new one with the entity
                         ner_model = {
                             "model": annotation.model_id.name,
-                            "entities": [annotation.entity_id.name]
+                            "entities": [annotation.entity_id.name],
+                            "path": [annotation.model_id.containing_folder]
                         }
                         model_info_list.append(ner_model)
 
@@ -104,9 +103,6 @@ class NerAnnotation(models.Model):
                         }
                         annotation_list.append(data)
 
-                print(len(model_info_list))
-                print(len(annotation_list))
-
                 # Sort data by model name
                 model_info_list.sort(key=lambda x: x["model"])
                 annotation_list.sort(key=lambda x: x["model"])
@@ -122,15 +118,22 @@ class NerAnnotation(models.Model):
                         # Find the matching model info
                         matching_model = next((model for model in model_info_list if model['model'] == model_name), None)
 
-                        print(matching_model['entities'])
                         if matching_model:
                             labels = matching_model['entities']
                             language = 'en'
-                            model_path = os.path.join('odoo/addons/prueba/NER/', model_name)
+                            joined_model_path = os.path.join(''.join(matching_model['path']), model_name)
+                            # Todo: let user change this parameters
                             learn_rate = 0.001
                             iterations = 50
                             batch_size = 10
-                            # Uncomment when NerController is implemented
-                            # ner = NerController(labels, language, model_path, None, learn_rate, iterations, batch_size)
+                            # Train model, if the model doesn't exist in the path, create it
+                            ner = NerController(joined_model_path, language, labels,  None, learn_rate, iterations, batch_size, annotations_group)
+                            if os.path.exists(joined_model_path):
+                                ner.train_ner_model()
+                                model = self.env['ner.model'].search([('name', '=', matching_model['model'])], limit=1)
+                                model.active = False
+                                print(model.active)
+                            else:
+                                ner.create_ner_model()
 
             return True

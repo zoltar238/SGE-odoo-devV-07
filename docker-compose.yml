@@ -33,6 +33,9 @@ services:
       - ./odoo/config:/etc/odoo
       - odoo_log:/var/log/odoo/
       - odoo_data:/var/lib/odoo
+      - ./odoo/addons/NER:/var/lib/NER
+      # volumen para los modelos NER
+
   pgadmin:
     image: dpage/pgadmin4:latest
     container_name: pgadmin4

@@ -13,4 +13,4 @@ class NerModel(models.Model):
          ('es', 'Spanish')
      ], string="Language", default='en', required=True)
      containing_folder = fields.Char(string="Folder containing this model", required=True, default="odoo/addons/prueba/NER")
-     active = fields.Boolean(string="Active", default=True)
+     active = fields.Boolean(string="Active", default=False)

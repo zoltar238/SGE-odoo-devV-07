@@ -8,7 +8,7 @@ from spacy.training import offsets_to_biluo_tags
 
 
 class NerController:
-    def __init__(self, labels, language, model_path, data_path, learn_rate, iterations, batch_size, train_data=None):
+    def __init__(self, model_path, language=None, labels=None, data_path=None, learn_rate=None, iterations=None, batch_size=None, data_list=None):
         self.labels = labels
         self.language = language
         self.model_path = model_path
@@ -16,7 +16,7 @@ class NerController:
         self.learn_rate = learn_rate
         self.iterations = iterations
         self.batch_size = batch_size
-        self.train_data = train_data  # Se asigna por defecto
+        self.train_data = data_list
 
         # Cargar datos desde el archivo JSON si existe
         if data_path and os.path.exists(data_path):  # Verifica si el archivo existe
@@ -26,7 +26,7 @@ class NerController:
                 print(f"Datos cargados correctamente desde {data_path}")
             except (json.JSONDecodeError, IOError) as e:
                 print(f"Error al cargar el archivo JSON: {e}")
-        elif train_data:
+        elif data_list:
             print("Usando datos de entrenamiento proporcionados directamente.")
         else:
             print("Advertencia: No se proporcionaron datos de entrenamiento.")
@@ -83,14 +83,20 @@ class NerController:
         # Load the trained model
         nlp = spacy.load(self.model_path)
 
-        # Analyze the data with the trained model
-
+        # Analyze the data with the trained model and return the results
         results = []
-        for data in self.train_data:
+        for index, data in enumerate(self.train_data):
             text = data["text"]
             doc = nlp(text.strip())
-            for ent in doc.ents:
-                print(ent.text, ent.label_)
+            entities = []
+            if doc.ents:
+                for ent in doc.ents:
+                    entities.append([ent.start_char, ent.end_char, ent.label_, ent.text])
+                    print(ent.text, ent.label_)
+            results.append({"index": index, "text": data["text"], "entities": entities})
+
+        return results
+
 
     # Method for training the model with the given data
     def data_trainer(self, ner, model):

@@ -89,12 +89,14 @@
                 <sheet>
                     <group>
                         <field name="name"/>
+                        <field name="text_list" widget="ace"/>
                         <group>
-                            <field name="text_list" widget="ace"/>
                             <button name="button_data_sanitizer" string="Sanitize data" type="object"
                                     class="btn_primary"/>
+                            <button name="button_detect_entities" string="Detect named entities" type="object"
+                                    class="btn_primary"/>
+                            <field name="model_ids" widget="many2many_tags"/>
                         </group>
-                        <field name="model_ids" widget="many2many_tags"/>
                     </group>
                     <notebook>
                         <page string="Annotations">

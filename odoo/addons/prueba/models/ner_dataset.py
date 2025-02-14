@@ -1,5 +1,8 @@
+import os.path
+
 from odoo import api, fields, models
 from odoo.addons.prueba.controllers.data_controller import english_data_sanitizer
+from odoo.addons.prueba.controllers.ner_controller import NerController
 
 
 class NerDataset(models.Model):
@@ -28,4 +31,56 @@ class NerDataset(models.Model):
                     result_data += data+'\n'
 
                 rec.text_list = result_data.strip()
+
+    @api.depends("model_ids.name")
+    def button_detect_entities(self):
+        for rec in self:
+            # Split text into list
+            data_list = []
+            text_list = rec.text_list.split('\n')
+            for text in text_list:
+                data_list.append({"text": text})
+
+            # Detect entities for each model
+            for model in rec.model_ids:
+                path = os.path.join(model.containing_folder,model.name)
+                # Check if NER model exits before using it
+                if os.path.exists(path):
+                    ner = NerController(model_path=path, data_list=data_list)
+                    results = ner.analyze_data()
+                    for result in results:
+                        for entity in result['entities']:
+                            # Get all necessary elements
+                            start_char, end_char, entity_label, entity_text = entity
+                            entity_record = self.env['ner.entity'].search([('name', '=', entity_label)], limit=1)
+
+                            # Check if a model with the same data already exist
+                            existing_annotation = self.env['ner.annotation'].search([
+                                ('text_index', '=', result['index'] + 1),
+                                ('model_id', '=', model.id),
+                                ('start_char', '=', start_char),
+                                ('end_char', '=', end_char),
+                                ('entity_id', '=', entity_record.id),
+                                ('dataset_id', '=', self.id)
+                            ], limit=1)
+
+                            # If it does not exist, create a new model with the data
+                            if not existing_annotation:
+                                annotation_vals = {
+                                    'text_index': result['index'] + 1,
+                                    'model_id': model.id,
+                                    'end_char': end_char,
+                                    'start_char': start_char,
+                                    'entity_id': entity_record.id,
+                                    'text_content': entity_text,
+                                    'dataset_id': self.id
+                                }
+                                # Create the new model
+                                self.env['ner.annotation'].create(annotation_vals)
+
+                else:
+                    return False
+
+            return True
+
 
