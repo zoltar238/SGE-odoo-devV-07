@@ -10,6 +10,7 @@
                 <field name="language"/>
                 <field name="containing_folder"/>
                 <field name="active"/>
+                <field name="created"/>
             </tree>
         </field>
     </record>
@@ -26,6 +27,7 @@
                             <field name="language"/>
                             <field name="containing_folder"/>
                             <field name="active"/>
+                            <field name="created"/>
                         </group>
                         <group>
                             <field name="description"/>
@@ -93,10 +95,18 @@
                         <group>
                             <button name="button_data_sanitizer" string="Sanitize data" type="object"
                                     class="btn_primary"/>
+                            <div>
+                                <p>
+                                    <field name="wipe_punctuation" /> Wipe punctuation signs
+                                </p>
+                                <p>
+                                    <field name="wipe_numbers"/> Wipe numbers
+                                </p>
+                            </div>
                             <button name="button_detect_entities" string="Detect named entities" type="object"
                                     class="btn_primary"/>
-                            <field name="model_ids" widget="many2many_tags"/>
                         </group>
+                        <field name="model_ids" widget="many2many_tags"/>
                     </group>
                     <notebook>
                         <page string="Annotations">
@@ -109,6 +119,7 @@
                                     <field name="start_char"/>
                                     <field name="end_char"/>
                                     <field name="entity_id" domain="[('model_id', '=', model_id)]"/>
+                                    <field name="trained"/>
                                 </tree>
                             </field>
                         </page>
@@ -145,6 +156,7 @@
                                     | end:
                                     <field name="end_char"/>
                                 </p>
+                                <field name="trained"/> Trained
                             </group>
                         </div>
                         <button type="object" class="btn btn-primary" name="action_on_button_click">Train with this
