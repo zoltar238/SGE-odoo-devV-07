@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 from odoo import api, fields, models
 
 class NerModel(models.Model):
@@ -13,4 +11,5 @@ class NerModel(models.Model):
          ('es', 'Spanish')
      ], string="Language", default='en', required=True)
      containing_folder = fields.Char(string="Folder containing this model", required=True, default="var/lib/NER")
-     active = fields.Boolean(string="Active", default=False, context={'active_test': False})
+     active = fields.Boolean(string="Active", default=True)
+     created = fields.Boolean(string="Created", default=False, readonly=True)

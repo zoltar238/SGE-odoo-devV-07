@@ -13,24 +13,25 @@ class NerDataset(models.Model):
     text_list = fields.Json(string="Lista de textos", required=True)
     annotations = fields.One2many("ner.annotation", "dataset_id", string="Annotations")
     model_ids = fields.Many2many("ner.model", "ner_model_dataset_rel", "dataset_id", "model_id", string="Models", required=True)
+    wipe_punctuation = fields.Boolean(string="Wipe punctuation signs", default=True)
+    wipe_numbers = fields.Boolean(string="Wipe numbers", default=True)
 
     def button_data_sanitizer(self):
         for rec in self:
             if rec.text_list:
-                # text_list is already a list, no need to split
+                # Split the text into a list
                 data_list = rec.text_list.split('\n')
 
-                print(data_list)
-
                 # Sanitize the list
-                sanitized_data = english_data_sanitizer(data_list, True, True, True)
+                if rec.wipe_punctuation or rec.wipe_numbers:
+                    sanitized_data = english_data_sanitizer(data_list, rec.wipe_punctuation, rec.wipe_numbers)
 
-                # Save the sanitized list
-                result_data = ''
-                for data in sanitized_data:
-                    result_data += data+'\n'
+                    # Save the sanitized list
+                    result_data = ''
+                    for data in sanitized_data:
+                        result_data += data+'\n'
 
-                rec.text_list = result_data.strip()
+                    rec.text_list = result_data.strip()
 
     @api.depends("model_ids.name")
     def button_detect_entities(self):

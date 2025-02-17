@@ -1,14 +1,15 @@
 import json
 import random
 import shutil
+
 import spacy
 from spacy.training.example import Example
 from spacy.util import minibatch
-from spacy.training import offsets_to_biluo_tags
 
 
 class NerController:
-    def __init__(self, model_path, language=None, labels=None, data_path=None, learn_rate=None, iterations=None, batch_size=None, data_list=None):
+    def __init__(self, model_path, language=None, labels=None, data_path=None, learn_rate=None, iterations=None,
+                 batch_size=None, data_list=None):
         self.labels = labels
         self.language = language
         self.model_path = model_path
@@ -30,7 +31,6 @@ class NerController:
             print("Usando datos de entrenamiento proporcionados directamente.")
         else:
             print("Advertencia: No se proporcionaron datos de entrenamiento.")
-
 
     def create_ner_model(self):
         # Load the language model
@@ -76,7 +76,7 @@ class NerController:
 
         # Save the model
         nlp.to_disk(self.model_path)
-        print("The new data model has been trained")
+        print("The data model has been trained")
 
     # Method for analyzing data
     def analyze_data(self):
@@ -97,7 +97,6 @@ class NerController:
 
         return results
 
-
     # Method for training the model with the given data
     def data_trainer(self, ner, model):
         # Training configuration
@@ -115,11 +114,11 @@ class NerController:
                 # Create examples from the current batch of data
                 for item in batch:
                     text = item["text"]
-                    annotations = {"entities": [[start, end, label] for start, end, label, _ in item["entities"]]}  # Eliminamos el texto extraído
+                    annotations = {"entities": [[start, end, label] for start, end, label, _ in
+                                                item["entities"]]}  # Eliminamos el texto extraído
                     examples.append(Example.from_dict(model.make_doc(text), annotations))
 
                 # Update the model with the examples in the current batch
                 ner.update(examples, drop=0.5, losses=losses, sgd=optimizer)
             # todo: export information to json file
             print(f"Losses at epoch {epoch}: {losses}")
-
