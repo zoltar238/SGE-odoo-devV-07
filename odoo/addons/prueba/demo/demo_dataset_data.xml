@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <record id="ner_dataset_news" model="ner.dataset">
+            <field name="name">News dataset</field>
+            <field name="text_list">John Doe works at OpenAI and lives in New York since 2020
+Elon Musk founded Tesla in 2003 in Palo Alto
+NASA launched a mission to Mars in July 2022
+Jennifer Aniston was born in Los Angeles on February 11 1969
+Google was founded by Larry Page and Sergey Brin in 1998
+Apple is headquartered in Cupertino California since 1976
+Barack Obama served as President of the USA from 2009 to 2017
+The United Nations is based in New York
+Bill Gates started Microsoft in 1975 in Albuquerque
+The Eiffel Tower is one of the most famous landmarks in Paris
+Meta formerly known as Facebook is based in Menlo Park
+Cristiano Ronaldo was born on February 5 1985 in Portugal
+The Louvre Museum is in Paris France
+Amazon was founded by Jeff Bezos in 1994
+The Olympics in Tokyo were held in 2021
+Tesla’s headquarters is in Austin Texas
+Shakespeare was born in April 1564 in England
+The World Health Organization (WHO) was founded in 1948
+IBM was established in 1911 and is a pioneer in computing
+The Golden Gate Bridge is an iconic landmark in San Francisco</field>
+            <field name="model_ids" eval="[(6, 0, [ref('ner_model_news_analyzer')])]"/>
+        </record>
+    </data>
+</odoo>

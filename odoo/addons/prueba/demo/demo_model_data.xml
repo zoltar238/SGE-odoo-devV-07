@@ -6,7 +6,8 @@
             <field name="description">NER model destined to analyze information inside news</field>
             <field name="language">en</field>
             <field name="containing_folder">var/lib/NER</field>
-            <field name="active">0</field>
+            <field name="active">1</field>
+            <field name="created">0</field>
         </record>
     </data>
 </odoo>
