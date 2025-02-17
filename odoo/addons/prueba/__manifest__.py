@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 {
-    'name': "Model1",
+    'name': "NER",
 
     'summary': "Short (1 phrase/line) summary of the module's purpose",
 
@@ -27,7 +27,7 @@ Long description of module's purpose
     ],
     # only loaded in demonstration mode
     'demo': [
-        #'demo/demo.xml',
+        'demo/demo.xml',
     ],
     'installable': True,
     'application': True,

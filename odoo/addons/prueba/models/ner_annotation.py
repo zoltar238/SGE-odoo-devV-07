@@ -14,7 +14,7 @@ class NerAnnotation(models.Model):
     end_char = fields.Integer(string="End Character", required=True)
     entity_id = fields.Many2one("ner.entity", string="Entity", required=True, ondelete="cascade")
     dataset_id = fields.Many2one("ner.dataset", string="Dataset", required=True, ondelete="cascade")
-    model_id = fields.Many2one("ner.model", string="Model", required=True, ondelete="set null")
+    model_id = fields.Many2one("ner.model", string="Model", required=True, ondelete="cascade")
     text_index = fields.Integer(
         string="Text Index",
         required=True,
