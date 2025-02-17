@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+
+
 {
     'name': "NER",
 
@@ -20,14 +22,17 @@ Long description of module's purpose
     # any module necessary for this one to work correctly
     'depends': ['base'],
 
-    # always loaded
+    # views and security
     'data': [
         'security/ir.model.access.csv',
         'views/views.xml',
     ],
-    # only loaded in demonstration mode
+    # demo data
     'demo': [
-        'demo/demo.xml',
+        'demo/demo_model_data.xml',
+        'demo/demo_entity_data.xml',
+        'demo/demo_dataset_data.xml',
+        'demo/demo_annotation_data.xml',
     ],
     'installable': True,
     'application': True,
