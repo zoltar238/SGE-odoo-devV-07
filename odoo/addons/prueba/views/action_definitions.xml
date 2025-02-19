@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Actions -->
+    <record id="action_ner_model" model="ir.actions.act_window">
+        <field name="name">NER Models</field>
+        <field name="res_model">ner.model</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <record id="action_ner_entity" model="ir.actions.act_window">
+        <field name="name">NER Entities</field>
+        <field name="res_model">ner.entity</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <record id="action_ner_dataset" model="ir.actions.act_window">
+        <field name="name">NER Datasets</field>
+        <field name="res_model">ner.dataset</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <record id="action_ner_annotation" model="ir.actions.act_window">
+        <field name="name">NER Annotations</field>
+        <field name="res_model">ner.annotation</field>
+        <field name="view_mode">kanban,form</field>
+    </record>
+</odoo>

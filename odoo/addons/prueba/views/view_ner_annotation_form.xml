@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_ner_annotation_form" model="ir.ui.view">
+        <field name="name">ner.annotation.form</field>
+        <field name="model">ner.annotation</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <field name="dataset_id" readonly="1"/>
+                        <field name="text_index" readonly="1"/>
+                        <field name="text_content" readonly="1"/>
+                        <field name="start_char"/>
+                        <field name="end_char"/>
+                        <field name="entity_id"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+</odoo>

@@ -1,40 +1,50 @@
 # -*- coding: utf-8 -*-
-
-
 {
-    'name': "NER",
+    'name': "NER (Named Entity Recognition)",
 
-    'summary': "Short (1 phrase/line) summary of the module's purpose",
+    'summary': "A module for managing Named Entity Recognition (NER) models, datasets, and annotations.",
 
     'description': """
-Long description of module's purpose
+This module provides functionality for training and managing Named Entity Recognition (NER) models,
+including dataset handling, entity annotation, and model evaluation.
     """,
 
-    'author': "My Company",
-    'website': "https://www.yourcompany.com",
+    'author': "Andrei Darius Bacanu",
+    'website': "https://github.com/zoltar238/SGE-odoo-devV-07",
 
-    # Categories can be used to filter modules in modules listing
-    # Check https://github.com/odoo/odoo/blob/15.0/odoo/addons/base/data/ir_module_category_data.xml
-    # for the full list
-    'category': 'Uncategorized',
-    'version': '0.1',
+    'category': 'Artificial Intelligence',
+    'version': '1.0',
 
-    # any module necessary for this one to work correctly
+    # Dependencies
     'depends': ['base'],
+    'external_dependencies': {
+        'python': ['spacy'],
+    },
 
-    # views and security
+    # Views and security
     'data': [
         'security/ir.model.access.csv',
-        'views/views.xml',
+        'views/view_ner_model_tree.xml',
+        'views/view_ner_model_form.xml',
+        'views/view_ner_entity_tree.xml',
+        'views/view_ner_entity_form.xml',
+        'views/view_ner_dataset_tree.xml',
+        'views/view_ner_dataset_form.xml',
+        'views/view_ner_annotation_kanban.xml',
+        'views/view_ner_annotation_form.xml',
+        'views/action_definitions.xml',
+        'views/menu_definitions.xml',
     ],
-    # demo data
+
+    # Demo data
     'demo': [
-        'demo/demo_model_data.xml',
-        'demo/demo_entity_data.xml',
-        'demo/demo_dataset_data.xml',
-        'demo/demo_annotation_data.xml',
+        'demo/demo_model.xml',
+        'demo/demo_entity.xml',
+        'demo/demo_dataset.xml',
+        'demo/demo_annotation.xml',
     ],
+
     'installable': True,
     'application': True,
-    'auto_install': True,
+    'auto_install': False,
 }

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_ner_dataset_tree" model="ir.ui.view">
+        <field name="name">ner.dataset.tree</field>
+        <field name="model">ner.dataset</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="image" widget="image" options="{'size': [30, 30]}"/>
+                <field name="name"/>
+                <field name="model_ids" widget="many2many_tags"/>
+            </tree>
+        </field>
+    </record>
+</odoo>

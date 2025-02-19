@@ -1,21 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-
-<!-- ner_model_views.xml -->
 <odoo>
-    <record id="view_ner_model_tree" model="ir.ui.view">
-        <field name="name">ner.model.tree</field>
-        <field name="model">ner.model</field>
-        <field name="arch" type="xml">
-            <tree>
-                <field name="name"/>
-                <field name="language"/>
-                <field name="containing_folder"/>
-                <field name="active"/>
-                <field name="created"/>
-            </tree>
-        </field>
-    </record>
-
     <record id="view_ner_model_form" model="ir.ui.view">
         <field name="name">ner.model.form</field>
         <field name="model">ner.model</field>
@@ -34,6 +18,8 @@
                             <field name="description"/>
                         </group>
                     </group>
+                    <button name="action_delete_model" type="object" class="btn btn-danger"
+                            string="Delete Model" confirm="Are you sure you want to delete this model? This action will delete this NER model from the database and all it´s files"/>
                 </sheet>
             </form>
         </field>

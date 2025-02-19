@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_ner_annotation_kanban" model="ir.ui.view">
+        <field name="name">ner.annotation.kanban</field>
+        <field name="model">ner.annotation</field>
+        <field name="arch" type="xml">
+            <kanban default_group_by="dataset_id" clickable="True">
+                <header>
+                    <button type="object" class="btn btn-primary" name="action_on_button_click">Train with this
+                        dataset
+                    </button>
+                </header>
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="oe_kanban_card" t-att-record-id="record.id.raw" draggable="False">
+                            <group>
+                                <p>
+                                    Text:
+                                    <field name="text_content"/>
+                                    | index:
+                                    <field name="text_index"/>
+                                </p>
+                                <p>
+                                    Start:
+                                    <field name="start_char"/>
+                                    | end:
+                                    <field name="end_char"/>
+                                </p>
+                                <field name="trained"/> Trained
+                            </group>
+                        </div>
+                        <button type="object" class="btn btn-primary" name="action_on_button_click">Train with this
+                            dataset
+                        </button>
+                    </t>
+                </templates>
+                <div class="oe_kanban_controls">
+
+                </div>
+            </kanban>
+        </field>
+    </record>
+</odoo>

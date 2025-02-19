@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_ner_entity_tree" model="ir.ui.view">
+        <field name="name">ner.entity.tree</field>
+        <field name="model">ner.entity</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+                <field name="entity_type"/>
+                <field name="model_id" widget="many2many_tags"/>
+            </tree>
+        </field>
+    </record>
+</odoo>

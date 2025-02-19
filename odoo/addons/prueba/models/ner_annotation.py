@@ -20,7 +20,7 @@ class NerAnnotation(models.Model):
         help="Índice del texto en la lista de textos del dataset"
     )
     text_content = fields.Text(string="Text Content", compute='_compute_text_content')
-    trained = fields.Boolean(string="Trained", default = False, readonly = True)
+    trained = fields.Boolean(string="Trained", default = False)
     faulty_tokens = fields.Boolean(default=False, readonly=True)
 
     @api.depends('dataset_id.text_list', 'text_index', 'start_char', 'end_char')
@@ -142,9 +142,9 @@ class NerAnnotation(models.Model):
                             batch_size = 10
                             # Train model, if the model doesn't exist in the path, create it
                             ner = NerController(joined_model_path, language, labels,  None, learn_rate, iterations, batch_size, annotations_group)
+                            model = self.env['ner.model'].search([('name', '=', matching_model['model'])], limit=1)
                             if os.path.exists(joined_model_path):
                                 ner.train_ner_model()
-                                model = self.env['ner.model'].search([('name', '=', matching_model['model'])], limit=1)
                                 # Set Model created to true
                                 model.created = True
                             else:

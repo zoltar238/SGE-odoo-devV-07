@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_ner_dataset_form" model="ir.ui.view">
+        <field name="name">ner.dataset.form</field>
+        <field name="model">ner.dataset</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                        <field name="image" widget="image" options="{'size': [30, 30]}"/>
+                        <field name="text_list" widget="ace"/>
+                        <group>
+                            <button name="button_data_sanitizer" string="Sanitize data" type="object"
+                                    class="btn_primary"/>
+                            <div>
+                                <p>
+                                    <field name="wipe_punctuation"/>
+                                    Wipe punctuation signs
+                                </p>
+                                <p>
+                                    <field name="wipe_numbers"/>
+                                    Wipe numbers
+                                </p>
+                            </div>
+                            <button name="button_detect_entities" string="Detect named entities" type="object"
+                                    class="btn_primary"/>
+                        </group>
+                        <field name="model_ids" widget="many2many_tags"/>
+                    </group>
+                    <notebook>
+                        <page string="Annotations">
+                            <field name="annotations">
+                                <tree editable="bottom">
+                                    <field name="dataset_id"/>
+                                    <field name="model_id" domain="[('id', 'in', parent.model_ids)]"/>
+                                    <field name="text_index"/>
+                                    <field name="text_content" readonly="1"/>
+                                    <field name="start_char"/>
+                                    <field name="end_char"/>
+                                    <field name="entity_id" domain="[('model_id', '=', model_id)]"/>
+                                    <field name="trained"/>
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+</odoo>
