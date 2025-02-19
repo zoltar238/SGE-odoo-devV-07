@@ -47,11 +47,12 @@ class NerController:
             ner.add_label(label)
 
         # Train the model
-        self.data_trainer(ner, nlp)
+        training_results = self.data_trainer(ner, nlp)
 
         # Save the model
         nlp.to_disk(self.model_path)
         print("The new data model has been created")
+        return training_results
 
     # Method for deleting the ner data model
     def delete_ner_model(self):
@@ -72,11 +73,12 @@ class NerController:
             ner = nlp.get_pipe("ner")
 
         # Train model
-        self.data_trainer(ner, nlp)
+        training_results = self.data_trainer(ner, nlp)
 
         # Save the model
         nlp.to_disk(self.model_path)
         print("The data model has been trained")
+        return training_results
 
     # Method for analyzing data
     def analyze_data(self):
@@ -102,6 +104,10 @@ class NerController:
         # Training configuration
         optimizer = model.initialize()
         optimizer.learn_rate = self.learn_rate
+
+        #List for holding result data
+        results = []
+
         for epoch in range(self.iterations):
             random.shuffle(self.train_data)
             losses = {}
@@ -120,5 +126,10 @@ class NerController:
 
                 # Update the model with the examples in the current batch
                 ner.update(examples, drop=0.5, losses=losses, sgd=optimizer)
-            # todo: export information to json file
+            total_loss = sum(losses.values()) / len(losses) if losses else 0
+            results.append({'iteration': epoch, 'losses': float(total_loss)})
             print(f"Losses at epoch {epoch}: {losses}")
+
+        print(results)
+        # Return result list
+        return results
