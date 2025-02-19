@@ -187,6 +187,7 @@ class NerAnnotation(models.Model):
 
                             #Create report
                             new_report = {
+                                'reference':f'Training {fields.Datetime.now()}',
                                 'action_type': 'training',
                                 'state': 'completed',
                                 'iteration_count': iterations,
@@ -221,6 +222,7 @@ class NerAnnotation(models.Model):
 
                 #Create report
                 new_report = {
+                    'reference':f'Training {fields.Datetime.now()}',
                     'action_type': 'training',
                     'state': 'failed',
                     'iteration_count': iterations,
