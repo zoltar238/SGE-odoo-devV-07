@@ -29,4 +29,11 @@
               parent="menu_ner_root"
               action="action_ner_annotation"
               sequence="40"/>
+
+    <menuitem id="menu_ner_report"
+              name="NER Reports"
+              parent="menu_ner_root"
+              action="action_ner_report"
+              sequence="50"/>
+
 </odoo>

@@ -24,4 +24,19 @@
         <field name="res_model">ner.annotation</field>
         <field name="view_mode">kanban,form</field>
     </record>
+
+    <record id="action_ner_report" model="ir.actions.act_window">
+        <field name="name">NER Reports</field>
+        <field name="res_model">ner.report</field>
+        <field name="view_mode">kanban,tree,form,pivot,calendar</field>
+        <field name="context">{'search_default_my_reports': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No NER reports found
+            </p>
+            <p>
+                Create a new NER report to track your processing activities.
+            </p>
+        </field>
+    </record>
 </odoo>
