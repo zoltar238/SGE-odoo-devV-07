@@ -1,7 +1,7 @@
 from odoo.exceptions import ValidationError
 
 from odoo import fields, models
-from odoo.addons.prueba.controllers.ner_controller import NerController
+from odoo.addons.adb_NER.controllers.ner_controller import NerController
 import os
 
 

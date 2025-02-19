@@ -1,8 +1,10 @@
+import json
+
 from odoo.exceptions import ValidationError, UserError
 from odoo import api, fields, models
 import os
 from itertools import groupby
-from odoo.addons.prueba.controllers.ner_controller import NerController
+from odoo.addons.adb_NER.controllers.ner_controller import NerController
 
 
 class NerAnnotation(models.Model):
@@ -60,6 +62,7 @@ class NerAnnotation(models.Model):
 
 
     def action_on_button_click(self):
+        global current_model_name
         if self.dataset_id:
             # Obtain all annotations from dataset that haven`t been trained
             annotations = self.env['ner.annotation'].search([
@@ -124,11 +127,23 @@ class NerAnnotation(models.Model):
             # Transform dictionary to list
             split_annotation_list = list(split_annotation_list.values())
 
+            # Result object for the report
+            results = {
+                'process':'NER model training',
+            'training_results':[]
+            }
+
+            # Todo: let user change this parameters
+            learn_rate = 0.001
+            iterations = 50
+            batch_size = 10
+
             # Fixed loop to match entities with model names
             try:
                 for index, annotations_group in enumerate(split_annotation_list):
                     if annotations_group:  # Check if the group has annotations
                         model_name = annotations_group[0]['model']
+                        current_model_name = model_name
                         # Find the matching model info
                         matching_model = next((model for model in model_info_list if model['model'] == model_name), None)
 
@@ -136,33 +151,87 @@ class NerAnnotation(models.Model):
                             labels = matching_model['entities']
                             language = 'en'
                             joined_model_path = os.path.join(''.join(matching_model['path']), model_name)
-                            # Todo: let user change this parameters
-                            learn_rate = 0.001
-                            iterations = 50
-                            batch_size = 10
                             # Train model, if the model doesn't exist in the path, create it
                             ner = NerController(joined_model_path, language, labels,  None, learn_rate, iterations, batch_size, annotations_group)
                             model = self.env['ner.model'].search([('name', '=', matching_model['model'])], limit=1)
                             if os.path.exists(joined_model_path):
-                                ner.train_ner_model()
+                                # Train model and obtain trained results
+                                training_results = ner.train_ner_model()
+                                print(training_results)
+
                                 # Set Model created to true
                                 model.created = True
+                                # Append result
+                                results['training_results'].append({
+                                    'ner_model':matching_model['model'],
+                                'created':False,
+                                'success':True,
+                                'result_list':training_results
+                                })
                             else:
                                 # Create the new model mark it as created
-                                ner.create_ner_model()
+                                training_results=ner.create_ner_model()
+                                print(training_results)
                                 model.created = True
-                for annotation in annotations:
-                    annotation.trained = True
-                return {
-                        'type': 'ir.actions.client',
-                        'tag': 'display_notification',
-                        'params': {
-                            'title': "Success",
-                            'message': "Data trained successfully",
-                            'sticky': False,
-                        }
-                }
+                                # Append result
+                                results['training_results'].append({
+                                    'ner_model':matching_model['model'],
+                                'created':True,
+                                'success':True,
+                                'result_list':training_results
+                                })
 
+                            # Mark all annotations used as trained
+                            for annotation in annotations:
+                                annotation.trained = True
+
+                            #Create report
+                            new_report = {
+                                'action_type': 'training',
+                                'state': 'completed',
+                                'iteration_count': iterations,
+                                'losses_average': iterations,
+                                'record_count': 50,
+                                'start_time': fields.Datetime.now(),
+                                'end_time': fields.Datetime.now(),
+                                'log':json.dumps(results, indent=4),
+                                'notes': 'Data trained successfully'
+                            }
+                            # Create the new model
+                            self.env['ner.report'].create(new_report)
+
+                            return {
+                                'type': 'ir.actions.client',
+                                'tag': 'display_notification',
+                                'params': {
+                                    'title': "Success",
+                                    'message': "Data trained successfully",
+                                    'sticky': False,
+                                }
+                            }
             # If an error occurs notify the user
             except Exception as e:
+                results['training_results'].append({
+                    'ner_model':current_model_name,
+                'created':False,
+                    'error':str(e),
+                'success':False,
+                'result_list':'Null'
+                })
+
+                #Create report
+                new_report = {
+                    'action_type': 'training',
+                    'state': 'failed',
+                    'iteration_count': iterations,
+                    'losses_average': iterations,
+                    'record_count': 50,
+                    'log':json.dumps(results, indent=4),
+                    'start_time': fields.Datetime.now(),
+                    'end_time': fields.Datetime.now(),
+                    'notes': 'Data trained successfully'
+                }
+                # Create the new model
+                self.env['ner.report'].create(new_report)
+
                 raise UserError(f'Internal error when training data: {e}')

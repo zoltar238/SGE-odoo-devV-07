@@ -16,7 +16,7 @@ including dataset handling, entity annotation, and model evaluation.
     'version': '1.0',
 
     # Dependencies
-    'depends': ['base'],
+    'depends': ['base', 'mail'],
     'external_dependencies': {
         'python': ['spacy'],
     },
@@ -34,6 +34,7 @@ including dataset handling, entity annotation, and model evaluation.
         'views/view_ner_annotation_form.xml',
         'views/action_definitions.xml',
         'views/menu_definitions.xml',
+        'views/view_ner_report_view.xml'
     ],
 
     # Demo data
