@@ -35,7 +35,7 @@
                             </div>
                             <footer class="oe_kanban_footer text-center">
                                 <button type="object" class="btn btn-warning" name="action_on_button_click">
-                                    <i class="fa fa-cogs"></i> Train with this dataset
+                                    <i class="fa fa-cogs"/> Train with this dataset
                                 </button>
                             </footer>
                         </div>
