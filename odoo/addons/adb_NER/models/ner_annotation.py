@@ -138,6 +138,8 @@ class NerAnnotation(models.Model):
             iterations = 50
             batch_size = 10
 
+
+
             # Fixed loop to match entities with model names
             try:
                 for index, annotations_group in enumerate(split_annotation_list):
@@ -146,6 +148,12 @@ class NerAnnotation(models.Model):
                         current_model_name = model_name
                         # Find the matching model info
                         matching_model = next((model for model in model_info_list if model['model'] == model_name), None)
+
+                        # Load the annotations from database
+                        entity_labels = self.env['ner.entity'].search([('model_id.name', '=', model_name)])
+
+                        for entity in entity_labels:
+                            print(f'Etiqueta de la entidad: {entity.name}')
 
                         if matching_model:
                             labels = matching_model['entities']
