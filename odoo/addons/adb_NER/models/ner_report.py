@@ -21,6 +21,7 @@ class NerReport(models.Model):
     # Campos de información general
     action_type = fields.Selection([
         ('training', 'Model Training'),
+        ('creation', 'Model Created'),
         ('detection', 'Entities detected'),
         ('deletion', 'Model deleted')
     ], string='Action Type', required=True)

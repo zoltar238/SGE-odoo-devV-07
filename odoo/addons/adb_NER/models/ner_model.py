@@ -27,6 +27,17 @@ class NerModel(models.Model):
             if os.path.exists(model_path):
                 ner.delete_ner_model()
             self.unlink()
+            # Create and add new report
+            new_report = {
+                'reference': f'DELETE {self.name}|{fields.Datetime.now()}',
+                'action_type': 'deletion',
+                'state': 'completed',
+                'start_time': fields.Datetime.now(),
+                'end_time': fields.Datetime.now(),
+                'log': "Model successfully deleted",
+                'notes': 'Model successfully deleted'
+            }
+            self.env['ner.report'].create(new_report)
             return {
                 'type': 'ir.actions.client',
                 'tag': 'display_notification',
@@ -37,4 +48,15 @@ class NerModel(models.Model):
                 }
             }
         except Exception as e:
+            #Create and add new report
+            new_report = {
+                'reference': f'DELETE {self.name}|{fields.Datetime.now()}',
+                'action_type': 'deletion',
+                'state': 'failed',
+                'start_time': fields.Datetime.now(),
+                'end_time': fields.Datetime.now(),
+                'log': str(e),
+                'notes': 'Internal error deleting model'
+            }
+            self.env['ner.report'].create(new_report)
             raise ValidationError(f"Error deleting model: {str(e)}")

@@ -1,5 +1,5 @@
 import os.path
-
+import json
 from odoo.exceptions import ValidationError, UserError
 
 from odoo import api, fields, models
@@ -38,64 +38,116 @@ class NerDataset(models.Model):
 
                     rec.text_list = result_data.strip()
 
-    @api.depends("model_ids.name")
+
     def button_detect_entities(self):
-        for rec in self:
-            # Split text into list
-            data_list = []
-            text_list = rec.text_list.split('\n')
-            for text in text_list:
-                data_list.append({"text": text})
+        global start_time, model
+        # Split text into list
+        data_list = []
+        text_list = self.text_list.split('\n')
+        for text in text_list:
+            data_list.append({"text": text})
 
-            # Detect entities for each model
-            try:
-                for model in rec.model_ids:
-                    path = os.path.join(model.containing_folder, model.name)
-                    # Check if NER model exits before using it
-                    if os.path.exists(path):
-                        ner = NerController(model_path=path, data_list=data_list)
-                        results = ner.analyze_data()
-                        for result in results:
-                            for entity in result['entities']:
-                                # Get all necessary elements
-                                start_char, end_char, entity_label, entity_text = entity
-                                entity_record = self.env['ner.entity'].search([('name', '=', entity_label)], limit=1)
+        # Detect entities for each model
+        try:
+            for model in self.model_ids:
+                start_time = fields.Datetime.now()
+                path = os.path.join(model.containing_folder, model.name)
+                # Check if NER model exits before using it
+                if os.path.exists(path):
+                    ner = NerController(model_path=path, data_list=data_list)
+                    results = ner.analyze_data()
+                    for result in results:
+                        for entity in result['entities']:
+                            # Get all necessary elements
+                            start_char, end_char, entity_label, entity_text = entity
+                            entity_record = self.env['ner.entity'].search([('name', '=', entity_label)], limit=1)
 
-                                # Check if a model with the same data already exist
-                                existing_annotation = self.env['ner.annotation'].search([
-                                    ('text_index', '=', result['index'] + 1),
-                                    ('model_id', '=', model.id),
-                                    ('start_char', '=', start_char),
-                                    ('end_char', '=', end_char),
-                                    ('entity_id', '=', entity_record.id),
-                                    ('dataset_id', '=', self.id)
-                                ], limit=1)
+                            # Check if a model with the same data already exist
+                            existing_annotation = self.env['ner.annotation'].search([
+                                ('text_index', '=', result['index'] + 1),
+                                ('model_id', '=', model.id),
+                                ('start_char', '=', start_char),
+                                ('end_char', '=', end_char),
+                                ('entity_id', '=', entity_record.id),
+                                ('dataset_id', '=', self.id)
+                            ], limit=1)
 
-                                # If it does not exist, create a new model with the data
-                                if not existing_annotation:
-                                    annotation_vals = {
-                                        'text_index': result['index'] + 1,
-                                        'model_id': model.id,
-                                        'end_char': end_char,
-                                        'start_char': start_char,
-                                        'entity_id': entity_record.id,
-                                        'text_content': entity_text,
-                                        'dataset_id': self.id
-                                    }
-                                    # Create the new model
-                                    self.env['ner.annotation'].create(annotation_vals)
-                        return {
-                            'type': 'ir.actions.client',
-                            'tag': 'display_notification',
-                            'params': {
-                                'title': "Success",
-                                'message': "Data analyzed successfully",
-                                'sticky': False,
-                            }
-                        }
-                    # If model could not be found
-                    else:
-                        raise ValidationError(f'NER model {model.name} not found')
-            # Throw an exception if data analysis fails
-            except Exception as e:
-                raise UserError(f'Internal error while analyzing data: {e}')
+                            # If it does not exist, create a new model with the data
+                            if not existing_annotation:
+                                annotation_vals = {
+                                    'text_index': result['index'] + 1,
+                                    'model_id': model.id,
+                                    'end_char': end_char,
+                                    'start_char': start_char,
+                                    'entity_id': entity_record.id,
+                                    'text_content': entity_text,
+                                    'dataset_id': self.id
+                                }
+                                # Create the new model
+                                self.env['ner.annotation'].create(annotation_vals)
+
+                    # Create result summary and report
+                    results = {
+                        'process': 'NER model data detection',
+                        'model': model.name,
+                        'detection_results': results
+                    }
+                    new_report = {
+                        'reference': f'DETECTED {model.name}|{fields.Datetime.now()}',
+                        'action_type': 'detection',
+                        'state': 'completed',
+                        'record_count': len(data_list),
+                        'success_count': len(results),
+                        'start_time': start_time,
+                        'end_time': fields.Datetime.now(),
+                        'log': json.dumps(results, indent=4),
+                        'notes': 'Data detected successfully'
+                    }
+                    self.env['ner.report'].create(new_report)
+
+                # If model could not be found
+                else:
+                    # Create result summary and report
+                    results = {
+                        'process': 'NER model data detection',
+                        'model': model.name,
+                        'detection_results': 'Null'
+                    }
+                    new_report = {
+                        'reference': f'DETECTED {model.name}|{fields.Datetime.now()}',
+                        'action_type': 'detection',
+                        'state': 'failed',
+                        'record_count': len(data_list),
+                        'start_time': start_time,
+                        'end_time': fields.Datetime.now(),
+                        'log': json.dumps(results, indent=4),
+                        'notes': 'Error detecting data'
+                    }
+                    self.env['ner.report'].create(new_report)
+                    raise ValidationError(f'NER model {model.name} not found')
+
+            # Show message of success if nothing fails
+            return {
+                'type': 'ir.actions.client',
+                'tag': 'display_notification',
+                'params': {
+                    'title': "Success",
+                    'message': "Data detected successfully",
+                    'sticky': False,
+                }
+            }
+        # Throw an exception if data analysis fails
+        except Exception as e:
+            # Create result summary and report
+            new_report = {
+                'reference': f'DETECTED {model.name}|{fields.Datetime.now()}',
+                'action_type': 'detection',
+                'state': 'failed',
+                'start_time': start_time,
+                'end_time': fields.Datetime.now(),
+                'log': str(e),
+                'notes': 'Internal error detecting data'
+            }
+            self.env['ner.report'].create(new_report)
+
+            raise UserError(f'Internal error while analyzing data: {e}')
