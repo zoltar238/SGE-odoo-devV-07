@@ -1,5 +1,6 @@
-import os.path
 import json
+import os.path
+
 from odoo.exceptions import ValidationError, UserError
 
 from odoo import api, fields, models
@@ -20,7 +21,6 @@ class NerDataset(models.Model):
     wipe_numbers = fields.Boolean(string="Wipe numbers", default=True)
     image = fields.Image(string="Dataset image")
 
-
     def button_data_sanitizer(self):
         for rec in self:
             if rec.text_list:
@@ -37,7 +37,6 @@ class NerDataset(models.Model):
                         result_data += data + '\n'
 
                     rec.text_list = result_data.strip()
-
 
     def button_detect_entities(self):
         global start_time, model

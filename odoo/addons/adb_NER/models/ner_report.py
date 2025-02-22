@@ -1,7 +1,6 @@
 from odoo import api, fields, models
 
 from odoo import models, fields, api
-from datetime import datetime
 
 class NerReport(models.Model):
     _name = "ner.report"
@@ -140,3 +139,21 @@ class NerReport(models.Model):
             'state': 'failed',
             'end_time': fields.Datetime.now()
         })
+
+    def create_new_report(self, vals):
+        vals.setdefault('reference', f'REPORT {fields.Datetime.now()}')
+        vals.setdefault('action_type', 'creation')
+        vals.setdefault('state', 'completed')
+        vals.setdefault('start_time', fields.Datetime.now())
+        vals.setdefault('end_time', fields.Datetime.now())
+        vals.setdefault('iteration_count', 0)
+        vals.setdefault('losses_average', 0.0)
+        vals.setdefault('record_count', 0)
+        vals.setdefault('success_count', 0)
+        vals.setdefault('error_count', 0)
+        vals.setdefault('success_rate', 0.0)
+        vals.setdefault('log', 'Report created successfully')
+        vals.setdefault('notes', 'Initial report creation')
+        vals.setdefault('company_id', self.env.company.id)
+        vals.setdefault('user_id', self.env.user.id)
+        return self.create(vals)

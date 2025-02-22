@@ -3,6 +3,7 @@ from odoo.exceptions import ValidationError
 from odoo import fields, models
 from odoo.addons.adb_NER.controllers.ner_controller import NerController
 import os
+import traceback
 
 
 class NerModel(models.Model):
@@ -26,18 +27,10 @@ class NerModel(models.Model):
             model_path = os.path.join(self.containing_folder, self.name)
             if os.path.exists(model_path):
                 ner.delete_ner_model()
+            # Delete model from database
             self.unlink()
-            # Create and add new report
-            new_report = {
-                'reference': f'DELETE {self.name}|{fields.Datetime.now()}',
-                'action_type': 'deletion',
-                'state': 'completed',
-                'start_time': fields.Datetime.now(),
-                'end_time': fields.Datetime.now(),
-                'log': "Model successfully deleted",
-                'notes': 'Model successfully deleted'
-            }
-            self.env['ner.report'].create(new_report)
+            # Generate report
+            self._create_report('deletion', self.name, 'Model successfully deleted')
             return {
                 'type': 'ir.actions.client',
                 'tag': 'display_notification',
@@ -47,16 +40,21 @@ class NerModel(models.Model):
                     'sticky': False,
                 }
             }
-        except Exception as e:
-            #Create and add new report
-            new_report = {
-                'reference': f'DELETE {self.name}|{fields.Datetime.now()}',
-                'action_type': 'deletion',
-                'state': 'failed',
-                'start_time': fields.Datetime.now(),
-                'end_time': fields.Datetime.now(),
-                'log': str(e),
-                'notes': 'Internal error deleting model'
-            }
-            self.env['ner.report'].create(new_report)
-            raise ValidationError(f"Error deleting model: {str(e)}")
+        except Exception:
+            # Capture the error and generate error report
+            error_trace = traceback.format_exc()
+            self._create_report('deletion', self.name, 'Internal error deleting model', error_trace)
+            raise ValidationError(f"Error deleting model: {error_trace}")
+
+
+    def _create_report(self, action_type, model_name, notes, error=None):
+        vals = {
+            'reference': f'{action_type.upper()} {model_name}|{fields.Datetime.now()}',
+            'action_type': action_type,
+            'state': 'failed' if error else 'completed',
+            'start_time': fields.Datetime.now(),
+            'end_time': fields.Datetime.now(),
+            'log': error if error else notes,
+            'notes': notes
+        }
+        self.env['ner.report'].create(vals)

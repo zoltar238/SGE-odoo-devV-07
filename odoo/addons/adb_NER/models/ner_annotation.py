@@ -1,9 +1,10 @@
-import json
+import os
+import traceback
+from itertools import groupby
 
 from odoo.exceptions import ValidationError, UserError
+
 from odoo import api, fields, models
-import os
-from itertools import groupby
 from odoo.addons.adb_NER.controllers.ner_controller import NerController
 
 
@@ -19,229 +20,173 @@ class NerAnnotation(models.Model):
     text_index = fields.Integer(
         string="Text Index",
         required=True,
+        default=1,
         help="Índice del texto en la lista de textos del dataset"
     )
     text_content = fields.Text(string="Text Content", compute='_compute_text_content')
-    trained = fields.Boolean(string="Trained", default = False)
+    trained = fields.Boolean(string="Trained", default=False)
     faulty_tokens = fields.Boolean(default=False, readonly=True)
 
     @api.depends('dataset_id.text_list', 'text_index', 'start_char', 'end_char')
     def _compute_text_content(self):
-        for rec in self:
-            # Verify that the dataset exists and the text index is different from none
-            if rec.dataset_id and rec.text_index is not None:
-                data_list = rec.dataset_id.text_list.split('\n')
+        for record in self:
+            # Verify that the dataset exists
+            if not record.dataset_id:
+                continue
 
-                # Verify text_index is within the limits of the dataset
-                if 0 <= rec.text_index - 1 <= len(data_list):
-                    text = data_list[rec.text_index - 1]
-                    # If no end and start char selected, set full line as selected text
-                    if rec.start_char == 0 and rec.end_char == 0:
-                        rec.text_content = text
-                    # When given and start and end character
-                    elif 0 <= rec.start_char < len(text) and 0 < rec.end_char <= len(text) and rec.end_char > rec.start_char:
-                        # End char surpasses token length
-                        if rec.end_char < len(text) and text[rec.end_char] != " ":
-                            rec.text_content = f'\"{text[rec.start_char:rec.end_char]}\" (No partial tokens allowed)'
-                            rec.faulty_tokens = True
-                        # Start char is lower than token length
-                        elif rec.start_char > 0 and text[rec.start_char - 1] != " ":
-                            rec.text_content = f'\"{text[rec.start_char:rec.end_char]}\" (No partial tokens allowed)'
-                            rec.faulty_tokens = True
-                        else :
-                            rec.text_content = text[rec.start_char:rec.end_char]
-                            rec.faulty_tokens = False
-                    # End char surpasses text length
-                    else:
-                        rec.text_content = f'\"{text[rec.start_char:len(text)]}\" (Out of bounds by {rec.end_char - len(text)} characters)'
-                        rec.faulty_tokens = True
-                # Text index is out of bounds
+            # Split the text list into individual lines
+            data_list = record.dataset_id.text_list.split('\n')
+
+            # Verify text_index is within the limits of the dataset
+            if not (0 <= record.text_index - 1 < len(data_list)):
+                record.text_content = "Text index out of bounds"
+                record.faulty_tokens = True
+                continue
+
+            # Get the specific text line based on text_index
+            text = data_list[record.text_index - 1]
+
+            # If no start and end characters are selected, set the full line as selected text
+            if record.start_char == 0 and record.end_char == 0:
+                record.text_content = text
+            # When given start and end characters
+            elif 0 <= record.start_char < len(text) and 0 < record.end_char <= len(
+                    text) and record.end_char > record.start_char:
+                # Check if the end character surpasses token length or start character is lower than token length
+                if (record.end_char < len(text) and text[record.end_char] != " ") or (
+                        record.start_char > 0 and text[record.start_char - 1] != " "):
+                    record.text_content = f'\"{text[record.start_char:record.end_char]}\" (No partial tokens allowed)'
+                    record.faulty_tokens = True
                 else:
-                    rec.text_content = "Text index out of bounds"
-                    rec.faulty_tokens = True
-
+                    record.text_content = text[record.start_char:record.end_char]
+                    record.faulty_tokens = False
+            # If end character surpasses text length
+            else:
+                record.text_content = f'\"{text[record.start_char:len(text)]}\" (Out of bounds by {record.end_char - len(text)} characters)'
+                record.faulty_tokens = True
 
     def action_on_button_click(self):
+        # Declare global variables to store the current model name and start time
         global current_model_name, start_time
-        if self.dataset_id:
-            # Obtain all annotations from dataset that haven`t been trained
-            annotations = self.env['ner.annotation'].search([
-                ('dataset_id', '=', self.dataset_id.id),
-                ('trained', '=', False)
-            ])
 
-            # Split text into list
-            if self.dataset_id.text_list:
-                text_list = self.dataset_id.text_list.split('\n')
+        # Check if the dataset is not set or the text list is empty, return early
+        if not self.dataset_id or not self.dataset_id.text_list:
+            return
 
-            # Sort the list by index order
-            sorted_annotations = annotations.sorted(key=lambda r: (r.text_index, r.model_id.name))
+        # Search for annotations that are not yet trained and belong to the current dataset
+        annotations = self.env['ner.annotation'].search([
+            ('dataset_id', '=', self.dataset_id.id),
+            ('trained', '=', False)
+        ])
 
-            # List to hold all the annotations
-            annotation_list = []
+        # Split the dataset text list into individual lines
+        text_list = self.dataset_id.text_list.split('\n')
+        # Sort annotations by text index and model name
+        sorted_annotations = annotations.sorted(key=lambda r: (r.text_index, r.model_id.name))
+        annotation_list = []
 
-            # Obtain all annotations
-            for annotation in sorted_annotations:
-                # Check for invalid tokens
-                if annotation.faulty_tokens:
-                    raise ValidationError(f"Faulty tokens detected at index: {annotation.text_index}")
+        # Process each annotation
+        for annotation in sorted_annotations:
+            # Raise an error if faulty tokens are detected
+            if annotation.faulty_tokens:
+                raise ValidationError(f"Faulty tokens detected at index: {annotation.text_index}")
 
-                # **Annotations: add or update the annotations in annotation_list**
-                # Check if there's already an annotation with the same text index and model
-                existing_annotation = next((data for data in annotation_list if data["model"] == annotation.model_id.name and data["text"] == text_list[annotation.text_index - 1]), None)
+            # Check if an existing annotation for the same model and text already exists
+            existing_annotation = next((data for data in annotation_list if
+                                        data["model"] == annotation.model_id.name and data["text"] == text_list[
+                                            annotation.text_index - 1]), None)
 
-                if existing_annotation:
-                    # If the annotation exists, add the new entity to it
-                    existing_annotation["entities"].append([annotation.start_char, annotation.end_char, annotation.entity_id.name, annotation.text_content])
+            # If an existing annotation is found, append the current annotation's entity to it
+            if existing_annotation:
+                existing_annotation["entities"].append(
+                    [annotation.start_char, annotation.end_char, annotation.entity_id.name, annotation.text_content])
+            # Otherwise, create a new annotation entry
+            else:
+                data = {
+                    "model": annotation.model_id.name,
+                    "text": text_list[annotation.text_index - 1],
+                    "entities": [[annotation.start_char, annotation.end_char, annotation.entity_id.name, annotation.text_content]]
+                }
+                annotation_list.append(data)
+
+        # Sort the annotation list by model name
+        annotation_list.sort(key=lambda x: x["model"])
+        # Group annotations by model name
+        split_annotation_list = list({key: list(group) for key, group in groupby(annotation_list, key=lambda x: x["model"])}.values())
+
+        # Set training parameters
+        learn_rate, iterations, batch_size, language = 0.001, 50, 10, 'en'
+
+        try:
+            # Process each group of annotations
+            for annotations_group in split_annotation_list:
+                if not annotations_group:
+                    continue
+
+                # Set the start time and current model name
+                start_time = fields.Datetime.now()
+                current_model_name = annotations_group[0]['model']
+                # Search for entity labels and model information
+                entity_labels = self.env['ner.entity'].search([('model_id.name', '=', current_model_name)])
+                entity_model = self.env['ner.model'].search([('name', '=', current_model_name)], limit=1)
+                labels = [entity.name for entity in entity_labels]
+                # Construct the model path
+                joined_model_path = os.path.join(''.join(entity_model.containing_folder), current_model_name)
+                # Initialize the NER controller
+                ner = NerController(joined_model_path, language, labels, None, learn_rate, iterations, batch_size, annotations_group)
+                model = self.env['ner.model'].search([('name', '=', entity_model.name)], limit=1)
+
+                # Train or create the NER model based on the existence of the model path
+                if os.path.exists(joined_model_path):
+                    training_results = ner.train_ner_model()
+                    model.created = True
                 else:
-                    # If the annotation does not exist, create a new one
-                    data = {
-                        "model": annotation.model_id.name,
-                        "text": text_list[annotation.text_index - 1],
-                        "entities": [[annotation.start_char, annotation.end_char, annotation.entity_id.name, annotation.text_content]]
-                    }
-                    annotation_list.append(data)
+                    training_results = ner.create_ner_model()
+                    model.created = True
+                    self._create_report('creation', current_model_name, start_time, 'NER model creation', 'NER model created successfully')
 
-            # Sort data by model name
-            annotation_list.sort(key=lambda x: x["model"])
+                # Mark all annotations as trained
+                for annotation in annotations:
+                    annotation.trained = True
 
-            split_annotation_list = {key: list(group) for key, group in groupby(annotation_list, key=lambda x: x["model"])}
-            # Transform dictionary to list
-            split_annotation_list = list(split_annotation_list.values())
+                # Create a training report
+                self._create_report('training', current_model_name, start_time, 'NER model training', 'Data trained successfully', iterations, training_results, len(sorted_annotations))
 
-            # Result object for the report
-            results = {
-                'process':'NER model training',
-            'training_results':[]
+            # Return a success notification
+            return {
+                'type': 'ir.actions.client',
+                'tag': 'display_notification',
+                'params': {
+                    'title': "Success",
+                    'message': "Data trained successfully",
+                    'sticky': False,
+                }
             }
 
-            # Todo: let user change this parameters
-            learn_rate = 0.001
-            iterations = 50
-            batch_size = 10
-            language = 'en'
+        except Exception:
+            # Capture the error trace and create a failure report
+            error_trace = traceback.format_exc()
+            self._create_report('training', current_model_name, start_time, 'NER model training', f'There was an error training the model: {current_model_name}', error=error_trace)
+            # Raise a UserError with the error trace
+            raise UserError(f'Internal error when training data: {error_trace}')
 
-            # Fixed loop to match entities with model names
-            try:
-                for index, annotations_group in enumerate(split_annotation_list):
-                    # Check if the group has annotations
-                    if annotations_group:
-                        start_time = fields.Datetime.now()
-                        current_model_name = annotations_group[0]['model']
-
-                        # Load the entities from database that match the NER model
-                        entity_labels = self.env['ner.entity'].search([('model_id.name', '=', current_model_name)])
-                        entity_model = self.env['ner.model'].search([('name', '=', current_model_name)], limit=1)
-                        labels = [entity.name for entity in entity_labels]
-
-                        joined_model_path = os.path.join(''.join(entity_model.containing_folder), current_model_name)
-                        # Train model, if the model doesn't exist in the path, create it
-                        ner = NerController(joined_model_path, language, labels,  None, learn_rate, iterations, batch_size, annotations_group)
-                        model = self.env['ner.model'].search([('name', '=', entity_model.name)], limit=1)
-                        if os.path.exists(joined_model_path):
-                            # Train model and obtain trained results
-                            training_results = ner.train_ner_model()
-
-                            # Set Model created to true just in case
-                            model.created = True
-
-                            new_model_created = False
-
-
-                            # Append result
-                            results['training_results'].append({
-                                'ner_model':current_model_name,
-                                'created':False,
-                                'success':True,
-                                'result_list':training_results
-                            })
-                        else:
-                            # Create the new model mark it as created
-                            training_results=ner.create_ner_model()
-                            model.created = True
-                            new_model_created = True
-                            # Append result
-                            results['training_results'].append({
-                                'ner_model':current_model_name,
-                                'created':True,
-                                'success':True,
-                                'result_list':training_results
-                            })
-
-                        # Mark all annotations used as trained
-                        for annotation in annotations:
-                            annotation.trained = True
-
-                        # Generate new report if a new model has been created
-                        if new_model_created:
-                            results = {
-                                'process': 'NER model created',
-                                'model': current_model_name,
-                            }
-                            new_report = {
-                                'reference': f'CREATED: {current_model_name}|{fields.Datetime.now()}',
-                                'action_type': 'creation',
-                                'state': 'completed',
-                                'iteration_count': 0,
-                                'losses_average': 0,
-                                'record_count': 0,
-                                'start_time': start_time,
-                                'end_time': fields.Datetime.now(),
-                                'log': json.dumps(results, indent=4),
-                                'notes': 'NER model created successfully'
-                            }
-                            self.env['ner.report'].create(new_report)
-
-                        # Create result summary and report
-                        results = {
-                            'process': 'NER model training',
-                            'model': current_model_name,
-                            'training_results': training_results
-                        }
-                        new_report = {
-                            'reference':f'TRAINED {current_model_name}|{fields.Datetime.now()}',
-                            'action_type': 'training',
-                            'state': 'completed',
-                            'iteration_count': iterations,
-                            'losses_average': sum(item["losses"] for item in training_results) / len(training_results),
-                            'record_count': len(sorted_annotations),
-                            'start_time': start_time,
-                            'end_time': fields.Datetime.now(),
-                            'log':json.dumps(results, indent=4),
-                            'notes': 'Data trained successfully'
-                        }
-                        # Create the new model
-                        self.env['ner.report'].create(new_report)
-
-                return {
-                    'type': 'ir.actions.client',
-                    'tag': 'display_notification',
-                    'params': {
-                        'title': "Success",
-                        'message': "Data trained successfully",
-                        'sticky': False,
-                    }
-                }
-            # If an error occurs notify the user
-            except Exception as e:
-                results = {
-                    'ner_model':current_model_name,
-                    'created':False,
-                    'error':str(e),
-                    'success':False,
-                    'result_list':'Null'
-                }
-
-                #Create new error report
-                new_report = {
-                    'reference': f'TRAINED {current_model_name}|{fields.Datetime.now()}',
-                    'action_type': 'training',
-                    'state': 'failed',
-                    'log':json.dumps(results, indent=4),
-                    'start_time': start_time,
-                    'end_time': fields.Datetime.now(),
-                    'notes': f'There was an error training the model: {current_model_name}'
-                }
-                self.env['ner.report'].create(new_report)
-
-                raise UserError(f'Internal error when training data: {e}')
+    def _create_report(self, action_type, model_name, start_time, process, notes, iterations=0, training_results=None, record_count=0, error=None):
+        vals = {
+            'reference': f'{action_type.upper()} {model_name}|{fields.Datetime.now()}',
+            'action_type': action_type,
+            'state': 'failed' if error else 'completed',
+            'iteration_count': iterations,
+            'losses_average': sum(item["losses"] for item in training_results) / len(training_results) if training_results else 0,
+            'record_count': record_count,
+            'start_time': start_time,
+            'end_time': fields.Datetime.now(),
+            'log': {
+                'process': process,
+                'model': model_name,
+                'success': not bool(error),
+                'training_results': training_results if training_results else 'Null',
+                'error': error,
+            },
+            'notes': notes
+        }
+        self.env['ner.report'].create_new_report(vals)

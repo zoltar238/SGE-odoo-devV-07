@@ -1,5 +1,6 @@
 from odoo import api, fields, models
 
+
 class NerEntity(models.Model):
     _name = "ner.entity"
     _description = "NER Entity"
