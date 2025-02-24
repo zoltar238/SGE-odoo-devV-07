@@ -5,7 +5,7 @@ from itertools import groupby
 from odoo.exceptions import ValidationError, UserError
 
 from odoo import api, fields, models
-from odoo.addons.adb_NER.controllers.ner_controller import NerController
+from odoo.addons.adb_ner.controllers.ner_controller import NerController
 
 
 class NerAnnotation(models.Model):

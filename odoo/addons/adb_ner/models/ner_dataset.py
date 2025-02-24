@@ -4,8 +4,8 @@ import os.path
 from odoo.exceptions import ValidationError, UserError
 
 from odoo import api, fields, models
-from odoo.addons.adb_NER.controllers.data_controller import english_data_sanitizer
-from odoo.addons.adb_NER.controllers.ner_controller import NerController
+from odoo.addons.adb_ner.controllers.data_controller import english_data_sanitizer
+from odoo.addons.adb_ner.controllers.ner_controller import NerController
 
 
 class NerDataset(models.Model):

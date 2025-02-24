@@ -86,12 +86,6 @@ class NerReport(models.Model):
         group_operator='avg'
     )
 
-    company_id = fields.Many2one(
-        'res.company',
-        string='Company',
-        default=lambda self: self.env.company
-    )
-
     # Campos relacionales
     user_id = fields.Many2one(
         'res.users',
@@ -167,6 +161,5 @@ class NerReport(models.Model):
         vals.setdefault('success_rate', 0.0)
         vals.setdefault('log', 'Report created successfully')
         vals.setdefault('notes', 'Initial report creation')
-        vals.setdefault('company_id', self.env.company.id)
         vals.setdefault('user_id', self.env.user.id)
         return self.create(vals)

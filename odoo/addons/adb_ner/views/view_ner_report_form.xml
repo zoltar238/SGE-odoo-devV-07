@@ -90,16 +90,6 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col-md-6">
-                                    <div class="o_group">
-                                        <div class="alert alert-secondary" role="alert">
-                                            <strong>Additional Information</strong>
-                                            <group>
-                                                <field name="company_id" groups="base.group_multi_company"/>
-                                            </group>
-                                        </div>
-                                    </div>
-                                </div>
                             </div>
                         </page>
                         <page string="Log &amp; Notes" name="log_notes">

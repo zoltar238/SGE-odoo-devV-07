@@ -50,11 +50,6 @@ including dataset handling, entity annotation, and model evaluation.
         'demo/demo_annotation.xml',
     ],
 
-    'assets': {
-        'web.assets_backend': [
-            'adb_NER/static/img/icons/*.svg',
-        ],
-    },
 
     'installable': True,
     'application': True,

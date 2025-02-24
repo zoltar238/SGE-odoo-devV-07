@@ -31,26 +31,6 @@
                                 <!-- Action type with icon -->
                                 <div class="d-flex flex-column mb-3">
                                     <div class="d-flex align-items-center">
-                                        <img t-if="record.action_type.raw_value == 'training'" 
-                                             t-attf-src="/adb_NER/static/img/icons/training.svg" 
-                                             alt="Training" 
-                                             class="me-2" 
-                                             style="width: 24px; height: 24px;"/>
-                                        <img t-if="record.action_type.raw_value == 'detection'" 
-                                             t-attf-src="/adb_NER/static/img/icons/detection.svg" 
-                                             alt="Detection" 
-                                             class="me-2" 
-                                             style="width: 24px; height: 24px;"/>
-                                        <img t-if="record.action_type.raw_value == 'deletion'" 
-                                             t-attf-src="/adb_NER/static/img/icons/deletion.svg" 
-                                             alt="Deletion" 
-                                             class="me-2" 
-                                             style="width: 24px; height: 24px;"/>
-                                        <img t-if="record.action_type.raw_value == 'creation'" 
-                                             t-attf-src="/adb_NER/static/img/icons/creation.svg" 
-                                             alt="Creation" 
-                                             class="me-2" 
-                                             style="width: 24px; height: 24px;"/>
                                         <span t-attf-class="badge rounded-pill px-3 py-2 bg-#{record.action_type.raw_value == 'training' ? 'info' : (record.action_type.raw_value == 'detection' ? 'primary' : (record.action_type.raw_value == 'creation' ? 'success' : 'secondary'))}">
                                             <field name="action_type"/>
                                         </span>
