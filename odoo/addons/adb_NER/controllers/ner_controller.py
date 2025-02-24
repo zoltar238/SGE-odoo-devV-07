@@ -1,7 +1,7 @@
 import json
 import random
 import shutil
-
+import os
 import spacy
 from spacy.training.example import Example
 from spacy.util import minibatch
@@ -56,7 +56,14 @@ class NerController:
 
     # Method for deleting the ner data model
     def delete_ner_model(self):
-        shutil.rmtree(self.model_path)
+        try:
+            if os.path.exists(self.model_path):
+                shutil.rmtree(self.model_path)
+                return {'message': f"The model {self.model_path} has been deleted"}
+            else:
+                return {'message': f"The model {self.model_path} does not exist"}
+        except Exception as e:
+            return {'error': f"Unexpected error: {str(e)}"}
 
     # Method for training model
     def train_ner_model(self):
