@@ -6,33 +6,46 @@
         <field name="arch" type="xml">
             <form>
                 <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" placeholder="Dataset Name" class="text-break"/>
+                        </h1>
+                    </div>
                     <group>
-                        <field name="name"/>
-                        <field name="image" widget="image" options="{'size': [30, 30]}"/>
-                        <field name="text_list" widget="ace"/>
-                        <group>
-                            <button name="button_data_sanitizer" string="Sanitize data" type="object"
-                                    class="oe_highlight"/>
-                            <div>
-                                <p>
-                                    <field name="wipe_punctuation"/>
-                                    Wipe punctuation signs
-                                </p>
-                                <p>
-                                    <field name="wipe_numbers"/>
-                                    Wipe numbers
-                                </p>
-                            </div>
-                            <button name="button_detect_entities" string="Detect named entities" type="object"
-                                    class="oe_highlight"/>
+                        <group string="Models">
+                            <field name="model_ids" widget="many2many_tags" options="{'no_create': True}"
+                                   placeholder="Select NER models to use"/>
                         </group>
-                        <field name="model_ids" widget="many2many_tags"/>
+                        <group string="Data Processing Options">
+                            <field name="wipe_punctuation" string="Remove punctuation signs"/>
+                            <field name="wipe_numbers" string="Remove numeric values"/>
+                        </group>
                     </group>
+                    <div class="text-editor-container" style="margin: 16px 0 8px 0;">
+                        <h3>Text Content</h3>
+                        <field name="text_list" 
+                               widget="ace" 
+                               options="{'mode': 'text'}" 
+                               style="min-height: 400px; width: 100%;"
+                               placeholder="Enter text for entity detection here..."/>
+                    </div>
+                    <div class="oe_button_box" name="button_box" style="margin-bottom: 8px;">
+                        <button name="button_data_sanitizer" 
+                                string="Sanitize Data" 
+                                type="object"
+                                class="oe_highlight btn-primary"
+                                icon="fa-magic"/>
+                        <button name="button_detect_entities" 
+                                string="Detect Named Entities" 
+                                type="object"
+                                class="oe_highlight btn-success"
+                                icon="fa-search"/>
+                    </div>
                     <notebook>
-                        <page string="Annotations">
+                        <page string="Detected Annotations" name="annotations">
                             <field name="annotations">
-                                <tree editable="bottom">
-                                    <field name="dataset_id"/>
+                                <tree editable="bottom" decoration-info="trained==False">
+                                    <field name="dataset_id" invisible="1"/>
                                     <field name="model_id" domain="[('id', 'in', parent.model_ids)]"/>
                                     <field name="text_index"/>
                                     <field name="text_content" readonly="1"/>

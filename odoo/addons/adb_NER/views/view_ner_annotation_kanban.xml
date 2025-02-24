@@ -6,36 +6,63 @@
         <field name="arch" type="xml">
             <kanban default_group_by="dataset_id" clickable="True">
                 <header>
-                    <button type="object" class="btn btn-success btn-block" name="action_on_button_click">
-                        <i class="fa fa-rocket"></i> Train with this dataset
+                    <button type="object" class="btn btn-primary btn-lg shadow-sm w-100" name="action_on_button_click">
+                        <i class="fa fa-rocket me-2"></i> Train with this dataset
                     </button>
                 </header>
                 <templates>
                     <t t-name="kanban-box">
-                        <div class="oe_kanban_card" t-att-record-id="record.id.raw" draggable="False">
+                        <div class="oe_kanban_card shadow-sm rounded-3 border-0 m-2" t-att-record-id="record.id.raw" draggable="False">
                             <div class="oe_kanban_details p-3">
-                                <h4 class="text-primary">Text Information</h4>
-                                <p>
-                                    <strong>Text:</strong> <field name="text_content"/>
-                                    <br/>
-                                    <strong>Index:</strong> <field name="text_index"/>
-                                </p>
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <div class="d-flex align-items-center">
+                                        <span class="badge rounded-pill bg-primary me-2">
+                                            <i class="fa fa-tag me-1"></i>
+                                            <field name="entity_id"/>
+                                        </span>
+                                        <span class="badge rounded-pill bg-info">
+                                            <i class="fa fa-hashtag me-1"></i>
+                                            <field name="text_index"/>
+                                        </span>
+                                    </div>
+                                    <div class="d-flex align-items-center">
+                                        <small class="text-muted me-2">Trained</small>
+                                        <field name="trained" widget="boolean_toggle"/>
+                                    </div>
+                                </div>
+                                
+                                <div class="bg-light p-2 rounded-3 mb-2">
+                                    <div class="text-muted small mb-1">
+                                        <i class="fa fa-file-text-o me-1"></i>Text Sample
+                                    </div>
+                                    <field name="text_content" class="text-muted fst-italic"/>
+                                </div>
 
-                                <h4 class="text-primary">Character Range</h4>
-                                <p>
-                                    <strong>Start:</strong> <field name="start_char"/>
-                                    <br/>
-                                    <strong>End:</strong> <field name="end_char"/>
-                                </p>
-
-                                <h4 class="text-primary">Status</h4>
-                                <p class="oe_status">
-                                    <strong>Trained:</strong> <field name="trained"/>
-                                </p>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div class="border rounded-3 p-2 flex-grow-1">
+                                        <div class="text-muted small mb-1">
+                                            <i class="fa fa-arrows-h me-1"></i>Character Range
+                                        </div>
+                                        <div class="d-flex justify-content-between">
+                                            <div>
+                                                <small class="text-muted">
+                                                    <i class="fa fa-arrow-right me-1"></i>Start
+                                                </small>
+                                                <div class="fw-bold"><field name="start_char"/></div>
+                                            </div>
+                                            <div class="ms-3">
+                                                <small class="text-muted">
+                                                    <i class="fa fa-arrow-left me-1"></i>End
+                                                </small>
+                                                <div class="fw-bold"><field name="end_char"/></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
-                            <footer class="oe_kanban_footer text-center">
-                                <button type="object" class="btn btn-warning" name="action_on_button_click">
-                                    <i class="fa fa-cogs"/> Train with this dataset
+                            <footer class="oe_kanban_footer p-2 bg-light border-top">
+                                <button type="object" class="btn btn-primary btn-sm w-100 shadow-sm" name="action_on_button_click">
+                                    <i class="fa fa-cogs me-2"></i>Train with this dataset
                                 </button>
                             </footer>
                         </div>
