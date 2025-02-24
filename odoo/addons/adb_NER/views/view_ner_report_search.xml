@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_ner_report_search" model="ir.ui.view">
+        <field name="name">ner.report.search</field>
+        <field name="model">ner.report</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="reference"/>
+                <field name="user_id"/>
+                <field name="action_type"/>
+                <filter string="Draft" name="draft" domain="[('state', '=', 'draft')]"/>
+                <filter string="In Progress" name="in_progress" domain="[('state', '=', 'in_progress')]"/>
+                <filter string="Completed" name="completed" domain="[('state', '=', 'completed')]"/>
+                <filter string="Failed" name="failed" domain="[('state', '=', 'failed')]"/>
+                <separator/>
+                <filter string="My Reports" name="my_reports" domain="[('user_id', '=', uid)]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Status" name="group_by_state" context="{'group_by': 'state'}"/>
+                    <filter string="Action Type" name="group_by_action" context="{'group_by': 'action_type'}"/>
+                    <filter string="User" name="group_by_user" context="{'group_by': 'user_id'}"/>
+                    <filter string="Date" name="group_by_month" context="{'group_by': 'create_date:month'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+</odoo>

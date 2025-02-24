@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_ner_report_tree" model="ir.ui.view">
+        <field name="name">ner.report.tree</field>
+        <field name="model">ner.report</field>
+        <field name="arch" type="xml">
+            <tree decoration-info="state == 'draft'"
+                  decoration-warning="state == 'in_progress'"
+                  decoration-success="state == 'completed'"
+                  decoration-danger="state == 'failed'">
+                <field name="reference"/>
+                <field name="action_type"/>
+                <field name="create_date"/>
+                <field name="record_count"/>
+                <field name="success_count"/>
+                <field name="success_rate" widget="percentage"/>
+                <field name="duration" widget="float_time"/>
+                <field name="user_id"/>
+                <field name="state"/>
+            </tree>
+        </field>
+    </record>
+</odoo>

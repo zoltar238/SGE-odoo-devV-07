@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_ner_report_form" model="ir.ui.view">
+        <field name="name">ner.report.form</field>
+        <field name="model">ner.report</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_complete" 
+                            string="Mark as Completed" 
+                            type="object" 
+                            class="oe_highlight btn-success"
+                    />
+                    <button name="action_fail" 
+                            string="Mark as Failed" 
+                            type="object" 
+                            class="btn-danger"
+                    />
+                    <field name="state" 
+                           widget="statusbar" 
+                           statusbar_visible="draft,in_progress,completed,failed"
+                    />
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box"/>
+                    <div class="oe_title">
+                        <div class="d-flex align-items-center mb-4">
+                            <div class="d-flex align-items-center bg-light rounded p-3 border" style="gap: 1rem;">
+                                <div class="o_stat_info">
+                                    <field name="action_type" invisible="1"/>
+                                    <span class="fa fa-2x fa-graduation-cap" groups="base.group_no_one" invisible="action_type != 'training'"/>
+                                    <span class="fa fa-2x fa-search" groups="base.group_no_one" invisible="action_type != 'detection'"/>
+                                    <span class="fa fa-2x fa-trash" groups="base.group_no_one" invisible="action_type != 'deletion'"/>
+                                    <span class="fa fa-2x fa-plus-circle" groups="base.group_no_one" invisible="action_type != 'creation'"/>
+                                </div>
+                                <field name="action_type" 
+                                       widget="selection"
+                                       readonly="1"
+                                       class="h4 m-0 text-nowrap"
+                                       style="font-size: 1.2em;"
+                                />
+                            </div>
+                        </div>
+                        <h1>
+                            <field name="reference" readonly="1" class="mb-0"/>
+                        </h1>
+                        <h4 class="text-muted">
+                            Created by <field name="user_id" readonly="1" class="d-inline"/> on <field name="create_date" readonly="1" class="d-inline"/>
+                        </h4>
+                    </div>
+                    <notebook>
+                        <page string="Overview" name="overview">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="o_group">
+                                        <div class="alert alert-info" role="alert">
+                                            <strong>Time Information</strong>
+                                            <group>
+                                                <field name="start_time"/>
+                                                <field name="end_time"/>
+                                                <field name="duration" widget="float_time"/>
+                                            </group>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="o_group">
+                                        <div class="alert alert-success" role="alert">
+                                            <strong>Processing Results</strong>
+                                            <group>
+                                                <field name="record_count"/>
+                                                <field name="success_count"/>
+                                                <field name="entities_count"/>
+                                                <field name="annotations_created"/>
+                                                <field name="success_rate" widget="progressbar"/>
+                                            </group>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row mt-4">
+                                <div class="col-md-6">
+                                    <div class="o_group">
+                                        <div class="alert alert-warning" role="alert">
+                                            <strong>Training Metrics</strong>
+                                            <group>
+                                                <field name="iteration_count"/>
+                                                <field name="losses_average" widget="progressbar"/>
+                                            </group>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="o_group">
+                                        <div class="alert alert-secondary" role="alert">
+                                            <strong>Additional Information</strong>
+                                            <group>
+                                                <field name="company_id" groups="base.group_multi_company"/>
+                                            </group>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </page>
+                        <page string="Log &amp; Notes" name="log_notes">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="o_group">
+                                        <div class="alert alert-info" role="alert">
+                                            <strong>Process Log</strong>
+                                        </div>
+                                        <field name="log" 
+                                               nolabel="1" 
+                                               placeholder="Detailed log information will be displayed here..."
+                                               class="form-control"
+                                               style="min-height: 200px;"
+                                        />
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="o_group">
+                                        <div class="alert alert-info" role="alert">
+                                            <strong>Notes</strong>
+                                        </div>
+                                        <field name="notes" 
+                                               nolabel="1"
+                                               placeholder="Add any additional notes or observations..."
+                                               class="form-control"
+                                               style="min-height: 200px;"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+</odoo>
