@@ -24,17 +24,22 @@ including dataset handling, entity annotation, and model evaluation.
     # Views and security
     'data': [
         'security/ir.model.access.csv',
+        'views/action_definitions.xml',
         'views/view_ner_model_tree.xml',
         'views/view_ner_model_form.xml',
         'views/view_ner_entity_tree.xml',
         'views/view_ner_entity_form.xml',
         'views/view_ner_dataset_tree.xml',
         'views/view_ner_dataset_form.xml',
-        'views/view_ner_annotation_kanban.xml',
         'views/view_ner_annotation_form.xml',
-        'views/action_definitions.xml',
+        'views/view_ner_annotation_kanban.xml',
+        'views/view_ner_report_tree.xml',
+        'views/view_ner_report_form.xml',
+        'views/view_ner_report_search.xml',
+        'views/view_ner_report_pivot.xml',
+        'views/view_ner_report_calendar.xml',
+        'views/view_ner_report_kanban.xml',
         'views/menu_definitions.xml',
-        'views/view_ner_report_view.xml'
     ],
 
     # Demo data
@@ -45,7 +50,13 @@ including dataset handling, entity annotation, and model evaluation.
         'demo/demo_annotation.xml',
     ],
 
+    'assets': {
+        'web.assets_backend': [
+            'adb_NER/static/img/icons/*.svg',
+        ],
+    },
+
     'installable': True,
     'application': True,
-    'auto_install': False,
+    'auto_install': True,
 }

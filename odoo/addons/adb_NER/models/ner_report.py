@@ -52,9 +52,14 @@ class NerReport(models.Model):
         help='Number of successfully processed records'
     )
 
-    error_count = fields.Integer(
-        string='Failed Records',
-        help='Number of records that failed processing'
+    entities_count = fields.Integer(
+        string='Entities Found',
+        help='Number of entities found in the processed data'
+    )
+
+    annotations_created = fields.Integer(
+        string='New Annotations Created',
+        help='Number of new annotations created during the process'
     )
 
     success_rate = fields.Float(
@@ -95,23 +100,29 @@ class NerReport(models.Model):
     )
 
     # Log
-    log = fields.Text(
+    log = fields.Html(
         string='Log',
-        help='Detailed log'
+        help='Detailed log',
+        readonly=True,
     )
 
     notes = fields.Text(
         string='Notes',
-        help='Additional notes or observations'
+        help='Additional notes or observations',
+        readonly=True
     )
 
     @api.depends('success_count', 'record_count')
     def _compute_success_rate(self):
         for record in self:
-            if record.record_count:
+            if record.record_count and record.action_type == 'detection':
                 record.success_rate = (record.success_count / record.record_count) * 100
-            else:
+            elif record.record_count and record.action_type == 'training':
+                record.success_rate = 100.0
+            elif record.state != 'completed':
                 record.success_rate = 0.0
+            else:
+                record.success_rate = 100.0
 
     @api.depends('start_time', 'end_time')
     def _compute_duration(self):
@@ -140,6 +151,7 @@ class NerReport(models.Model):
             'end_time': fields.Datetime.now()
         })
 
+    # Method to create a new report
     def create_new_report(self, vals):
         vals.setdefault('reference', f'REPORT {fields.Datetime.now()}')
         vals.setdefault('action_type', 'creation')
@@ -150,7 +162,8 @@ class NerReport(models.Model):
         vals.setdefault('losses_average', 0.0)
         vals.setdefault('record_count', 0)
         vals.setdefault('success_count', 0)
-        vals.setdefault('error_count', 0)
+        vals.setdefault('entities_count', 0)
+        vals.setdefault('annotations_created', 0)
         vals.setdefault('success_rate', 0.0)
         vals.setdefault('log', 'Report created successfully')
         vals.setdefault('notes', 'Initial report creation')

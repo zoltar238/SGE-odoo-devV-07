@@ -39,114 +39,112 @@ class NerDataset(models.Model):
                     rec.text_list = result_data.strip()
 
     def button_detect_entities(self):
-        global start_time, model
+        global start_time
         # Split text into list
         data_list = []
         text_list = self.text_list.split('\n')
         for text in text_list:
             data_list.append({"text": text})
 
+        # Initialize counters
+        total_lines = len(data_list)
+
         # Detect entities for each model
-        try:
-            for model in self.model_ids:
-                start_time = fields.Datetime.now()
-                path = os.path.join(model.containing_folder, model.name)
-                # Check if NER model exits before using it
-                if os.path.exists(path):
-                    ner = NerController(model_path=path, data_list=data_list)
-                    results = ner.analyze_data()
-                    for result in results:
-                        for entity in result['entities']:
-                            # Get all necessary elements
-                            start_char, end_char, entity_label, entity_text = entity
-                            entity_record = self.env['ner.entity'].search([('name', '=', entity_label)], limit=1)
+        for model in self.model_ids:
+            total_entities = 0
+            new_annotations = 0
+            analyzed_lines = 0
+            
+            start_time = fields.Datetime.now()
+            path = os.path.join(model.containing_folder, model.name)
+            # Check if NER model exits before using it
+            if os.path.exists(path):
+                ner = NerController(model_path=path, data_list=data_list)
+                results = ner.analyze_data()
+                model_entities = 0
 
-                            # Check if a model with the same data already exist
-                            existing_annotation = self.env['ner.annotation'].search([
-                                ('text_index', '=', result['index'] + 1),
-                                ('model_id', '=', model.id),
-                                ('start_char', '=', start_char),
-                                ('end_char', '=', end_char),
-                                ('entity_id', '=', entity_record.id),
-                                ('dataset_id', '=', self.id)
-                            ], limit=1)
+                for result in results:
+                    analyzed_lines += 1
+                    for entity in result['entities']:
+                        total_entities += 1
+                        model_entities += 1
+                        # Get all necessary elements
+                        start_char, end_char, entity_label, entity_text = entity
+                        entity_record = self.env['ner.entity'].search([('name', '=', entity_label)], limit=1)
 
-                            # If it does not exist, create a new model with the data
-                            if not existing_annotation:
-                                annotation_vals = {
-                                    'text_index': result['index'] + 1,
-                                    'model_id': model.id,
-                                    'end_char': end_char,
-                                    'start_char': start_char,
-                                    'entity_id': entity_record.id,
-                                    'text_content': entity_text,
-                                    'dataset_id': self.id
-                                }
-                                # Create the new model
-                                self.env['ner.annotation'].create(annotation_vals)
+                        # Check if a model with the same data already exist
+                        existing_annotation = self.env['ner.annotation'].search([
+                            ('text_index', '=', result['index'] + 1),
+                            ('model_id', '=', model.id),
+                            ('start_char', '=', start_char),
+                            ('end_char', '=', end_char),
+                            ('entity_id', '=', entity_record.id),
+                            ('dataset_id', '=', self.id)
+                        ], limit=1)
 
-                    # Create result summary and report
-                    results = {
-                        'process': 'NER model data detection',
-                        'model': model.name,
-                        'detection_results': results
+                        # If it does not exist, create a new model with the data
+                        if not existing_annotation:
+                            new_annotations += 1
+                            annotation_vals = {
+                                'text_index': result['index'] + 1,
+                                'model_id': model.id,
+                                'end_char': end_char,
+                                'start_char': start_char,
+                                'entity_id': entity_record.id,
+                                'text_content': entity_text,
+                                'dataset_id': self.id
+                            }
+                            # Create the new model
+                            self.env['ner.annotation'].create(annotation_vals)
+                
+                # Create report with detection statistics
+                report_data = {
+                    'results': results,
+                    'stats': {
+                        'total_lines': total_lines,
+                        'total_entities': model_entities,
+                        'new_annotations': new_annotations,
+                        'analyzed_lines': analyzed_lines
                     }
-                    new_report = {
-                        'reference': f'DETECTED {model.name}|{fields.Datetime.now()}',
-                        'action_type': 'detection',
-                        'state': 'completed',
-                        'record_count': len(data_list),
-                        'success_count': len(results),
-                        'start_time': start_time,
-                        'end_time': fields.Datetime.now(),
-                        'log': json.dumps(results, indent=4),
-                        'notes': 'Data detected successfully'
-                    }
-                    self.env['ner.report'].create(new_report)
-
-                # If model could not be found
-                else:
-                    # Create result summary and report
-                    results = {
-                        'process': 'NER model data detection',
-                        'model': model.name,
-                        'detection_results': 'Null'
-                    }
-                    new_report = {
-                        'reference': f'DETECTED {model.name}|{fields.Datetime.now()}',
-                        'action_type': 'detection',
-                        'state': 'failed',
-                        'record_count': len(data_list),
-                        'start_time': start_time,
-                        'end_time': fields.Datetime.now(),
-                        'log': json.dumps(results, indent=4),
-                        'notes': 'Error detecting data'
-                    }
-                    self.env['ner.report'].create(new_report)
-                    raise ValidationError(f'NER model {model.name} not found')
-
-            # Show message of success if nothing fails
-            return {
-                'type': 'ir.actions.client',
-                'tag': 'display_notification',
-                'params': {
-                    'title': "Success",
-                    'message': "Data detected successfully",
-                    'sticky': False,
                 }
-            }
-        # Throw an exception if data analysis fails
-        except Exception as e:
-            # Create result summary and report
-            new_report = {
-                'reference': f'DETECTED {model.name}|{fields.Datetime.now()}',
-                'action_type': 'detection',
-                'state': 'failed',
-                'start_time': start_time,
-                'end_time': fields.Datetime.now(),
-                'log': str(e),
-                'notes': 'Internal error detecting data'
-            }
-            self.env['ner.report'].create(new_report)
+                self._create_report(model.name, start_time, report_data)
 
-            raise UserError(f'Internal error while analyzing data: {e}')
+            # If model could not be found
+            else:
+                self._create_report(model.name, start_time, 'Null', error=True)
+                raise ValidationError(f'NER model {model.name} not found')
+
+        # Show message of success if nothing fails
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'display_notification',
+            'params': {
+                'title': "✅ Detection Completed Successfully",
+                'message': f"""
+Detection Summary:
+• Total lines processed: {total_lines}
+• Lines successfully analyzed: {analyzed_lines}
+• Total entities found: {total_entities}
+• New annotations created: {new_annotations}
+""",
+                'sticky': True,
+                'type': 'success'
+            }
+        }
+
+    def _create_report(self, model_name, start_time, results, error=False):
+        # Create result summary and report
+        new_report = {
+            'reference': f'DETECTION {model_name}|{fields.Datetime.now()}',
+            'action_type': 'detection',
+            'state': 'failed' if error else 'completed',
+            'record_count': results['stats']['total_lines'],
+            'success_count': results['stats']['analyzed_lines'],
+            'entities_count': results['stats']['total_entities'],
+            'annotations_created': results['stats']['new_annotations'],
+            'start_time': start_time,
+            'end_time': fields.Datetime.now(),
+            'log': json.dumps(results, indent=4),
+            'notes': 'Error detecting data' if error else 'Data detected successfully'
+        }
+        self.env['ner.report'].create(new_report)
