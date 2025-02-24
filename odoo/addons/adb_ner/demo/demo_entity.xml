@@ -1,22 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <data noupdate="1">
-        <record id="ner_entity_news_person" model="ner.entity">
+        <record id="ner_entity_news_person" model="adb_ner.entity">
             <field name="name">PERSON</field>
             <field name="entity_type">person</field>
             <field name="model_id" eval="[(6, 0, [ref('ner_model_news_analyzer')])]"/>
         </record>
-        <record id="ner_entity_news_org" model="ner.entity">
+        <record id="ner_entity_news_org" model="adb_ner.entity">
             <field name="name">ORG</field>
             <field name="entity_type">organization</field>
             <field name="model_id" eval="[(6, 0, [ref('ner_model_news_analyzer')])]"/>
         </record>
-        <record id="ner_entity_news_location" model="ner.entity">
+        <record id="ner_entity_news_location" model="adb_ner.entity">
             <field name="name">LOC</field>
             <field name="entity_type">location</field>
             <field name="model_id" eval="[(6, 0, [ref('ner_model_news_analyzer')])]"/>
         </record>
-        <record id="ner_entity_news_date" model="ner.entity">
+        <record id="ner_entity_news_date" model="adb_ner.entity">
             <field name="name">DATE</field>
             <field name="entity_type">date</field>
             <field name="model_id" eval="[(6, 0, [ref('ner_model_news_analyzer')])]"/>

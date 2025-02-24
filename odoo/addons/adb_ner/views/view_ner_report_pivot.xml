@@ -2,7 +2,7 @@
 <odoo>
     <record id="view_ner_report_pivot" model="ir.ui.view">
         <field name="name">ner.report.pivot</field>
-        <field name="model">ner.report</field>
+        <field name="model">adb_ner.report</field>
         <field name="arch" type="xml">
             <pivot string="NER Reports Analysis">
                 <field name="action_type" type="row"/>

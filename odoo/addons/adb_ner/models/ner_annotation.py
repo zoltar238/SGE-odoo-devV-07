@@ -9,14 +9,14 @@ from odoo.addons.adb_ner.controllers.ner_controller import NerController
 
 
 class NerAnnotation(models.Model):
-    _name = "ner.annotation"
+    _name = "adb_ner.annotation"
     _description = "NER Annotation"
 
     start_char = fields.Integer(string="Start Character", required=True)
     end_char = fields.Integer(string="End Character", required=True)
-    entity_id = fields.Many2one("ner.entity", string="Entity", required=True, ondelete="cascade")
-    dataset_id = fields.Many2one("ner.dataset", string="Dataset", required=True, ondelete="cascade")
-    model_id = fields.Many2one("ner.model", string="Model", required=True, ondelete="cascade")
+    entity_id = fields.Many2one("adb_ner.entity", string="Entity", required=True, ondelete="cascade")
+    dataset_id = fields.Many2one("adb_ner.dataset", string="Dataset", required=True, ondelete="cascade")
+    model_id = fields.Many2one("adb_ner.model", string="Model", required=True, ondelete="cascade")
     text_index = fields.Integer(
         string="Text Index",
         required=True,
@@ -74,7 +74,7 @@ class NerAnnotation(models.Model):
             return
 
         # Search for annotations that are not yet trained and belong to the current dataset
-        annotations = self.env['ner.annotation'].search([
+        annotations = self.env['adb_ner.annotation'].search([
             ('dataset_id', '=', self.dataset_id.id),
             ('trained', '=', False)
         ])

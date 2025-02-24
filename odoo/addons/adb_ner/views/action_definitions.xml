@@ -3,31 +3,31 @@
     <!-- Actions -->
     <record id="action_ner_model" model="ir.actions.act_window">
         <field name="name">NER Models</field>
-        <field name="res_model">ner.model</field>
+        <field name="res_model">adb_ner.model</field>
         <field name="view_mode">tree,form</field>
     </record>
 
     <record id="action_ner_entity" model="ir.actions.act_window">
         <field name="name">NER Entities</field>
-        <field name="res_model">ner.entity</field>
+        <field name="res_model">adb_ner.entity</field>
         <field name="view_mode">tree,form</field>
     </record>
 
     <record id="action_ner_dataset" model="ir.actions.act_window">
         <field name="name">NER Datasets</field>
-        <field name="res_model">ner.dataset</field>
+        <field name="res_model">adb_ner.dataset</field>
         <field name="view_mode">tree,form</field>
     </record>
 
     <record id="action_ner_annotation" model="ir.actions.act_window">
         <field name="name">NER Annotations</field>
-        <field name="res_model">ner.annotation</field>
+        <field name="res_model">adb_ner.annotation</field>
         <field name="view_mode">kanban,form</field>
     </record>
 
     <record id="action_ner_report" model="ir.actions.act_window">
         <field name="name">NER Reports</field>
-        <field name="res_model">ner.report</field>
+        <field name="res_model">adb_ner.report</field>
         <field name="view_mode">kanban,tree,form,pivot,calendar</field>
         <field name="context">{'search_default_my_reports': 1}</field>
         <field name="help" type="html">

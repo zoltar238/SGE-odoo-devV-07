@@ -2,7 +2,7 @@
 <odoo>
     <record id="view_ner_dataset_form" model="ir.ui.view">
         <field name="name">ner.dataset.form</field>
-        <field name="model">ner.dataset</field>
+        <field name="model">adb_ner.dataset</field>
         <field name="arch" type="xml">
             <form>
                 <sheet>

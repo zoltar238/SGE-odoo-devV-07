@@ -2,7 +2,7 @@
 <odoo>
     <record id="view_ner_report_calendar" model="ir.ui.view">
         <field name="name">ner.report.calendar</field>
-        <field name="model">ner.report</field>
+        <field name="model">adb_ner.report</field>
         <field name="arch" type="xml">
             <calendar string="NER Reports" date_start="create_date" color="user_id">
                 <field name="reference"/>

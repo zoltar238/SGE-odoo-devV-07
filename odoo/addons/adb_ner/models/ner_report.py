@@ -3,7 +3,7 @@ from odoo import api, fields, models
 from odoo import models, fields, api
 
 class NerReport(models.Model):
-    _name = "ner.report"
+    _name = "adb_ner.report"
     _description = "NER Report"
     _rec_name = 'reference'
     _order = 'create_date desc'

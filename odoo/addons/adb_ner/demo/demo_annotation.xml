@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <data noupdate="1">
-        <record id="annotation_1" model="ner.annotation">
+        <record id="annotation_1" model="adb_ner.annotation">
             <field name="start_char">0</field>
             <field name="end_char">8</field>
             <field name="entity_id" ref="ner_entity_news_person"/>
@@ -9,7 +9,7 @@
             <field name="model_id" ref="ner_model_news_analyzer"/>
             <field name="text_index">1</field>
         </record>
-        <record id="annotation_2" model="ner.annotation">
+        <record id="annotation_2" model="adb_ner.annotation">
             <field name="start_char">18</field>
             <field name="end_char">24</field>
             <field name="entity_id" ref="ner_entity_news_org"/>
@@ -17,7 +17,7 @@
             <field name="model_id" ref="ner_model_news_analyzer"/>
             <field name="text_index">1</field>
         </record>
-        <record id="annotation_3" model="ner.annotation">
+        <record id="annotation_3" model="adb_ner.annotation">
             <field name="start_char">38</field>
             <field name="end_char">46</field>
             <field name="entity_id" ref="ner_entity_news_location"/>
@@ -25,7 +25,7 @@
             <field name="model_id" ref="ner_model_news_analyzer"/>
             <field name="text_index">1</field>
         </record>
-        <record id="annotation_4" model="ner.annotation">
+        <record id="annotation_4" model="adb_ner.annotation">
             <field name="start_char">53</field>
             <field name="end_char">57</field>
             <field name="entity_id" ref="ner_entity_news_date"/>
@@ -34,7 +34,7 @@
             <field name="text_index">1</field>
         </record>
 
-        <record id="annotation_5" model="ner.annotation">
+        <record id="annotation_5" model="adb_ner.annotation">
             <field name="start_char">0</field>
             <field name="end_char">9</field>
             <field name="entity_id" ref="ner_entity_news_person"/>
@@ -42,7 +42,7 @@
             <field name="model_id" ref="ner_model_news_analyzer"/>
             <field name="text_index">2</field>
         </record>
-        <record id="annotation_6" model="ner.annotation">
+        <record id="annotation_6" model="adb_ner.annotation">
             <field name="start_char">18</field>
             <field name="end_char">23</field>
             <field name="entity_id" ref="ner_entity_news_org"/>
@@ -50,7 +50,7 @@
             <field name="model_id" ref="ner_model_news_analyzer"/>
             <field name="text_index">2</field>
         </record>
-        <record id="annotation_7" model="ner.annotation">
+        <record id="annotation_7" model="adb_ner.annotation">
             <field name="start_char">27</field>
             <field name="end_char">31</field>
             <field name="entity_id" ref="ner_entity_news_date"/>
@@ -58,7 +58,7 @@
             <field name="model_id" ref="ner_model_news_analyzer"/>
             <field name="text_index">2</field>
         </record>
-        <record id="annotation_8" model="ner.annotation">
+        <record id="annotation_8" model="adb_ner.annotation">
             <field name="start_char">35</field>
             <field name="end_char">44</field>
             <field name="entity_id" ref="ner_entity_news_location"/>
@@ -67,7 +67,7 @@
             <field name="text_index">2</field>
         </record>
 
-        <record id="annotation_9" model="ner.annotation">
+        <record id="annotation_9" model="adb_ner.annotation">
             <field name="start_char">0</field>
             <field name="end_char">4</field>
             <field name="entity_id" ref="ner_entity_news_org"/>
@@ -75,7 +75,7 @@
             <field name="model_id" ref="ner_model_news_analyzer"/>
             <field name="text_index">3</field>
         </record>
-        <record id="annotation_10" model="ner.annotation">
+        <record id="annotation_10" model="adb_ner.annotation">
             <field name="start_char">27</field>
             <field name="end_char">31</field>
             <field name="entity_id" ref="ner_entity_news_location"/>
@@ -83,7 +83,7 @@
             <field name="model_id" ref="ner_model_news_analyzer"/>
             <field name="text_index">3</field>
         </record>
-        <record id="annotation_11" model="ner.annotation">
+        <record id="annotation_11" model="adb_ner.annotation">
             <field name="start_char">35</field>
             <field name="end_char">44</field>
             <field name="entity_id" ref="ner_entity_news_date"/>
@@ -92,7 +92,7 @@
             <field name="text_index">3</field>
         </record>
 
-        <record id="annotation_12" model="ner.annotation">
+        <record id="annotation_12" model="adb_ner.annotation">
             <field name="start_char">0</field>
             <field name="end_char">16</field>
             <field name="entity_id" ref="ner_entity_news_person"/>
@@ -100,7 +100,7 @@
             <field name="model_id" ref="ner_model_news_analyzer"/>
             <field name="text_index">4</field>
         </record>
-        <record id="annotation_13" model="ner.annotation">
+        <record id="annotation_13" model="adb_ner.annotation">
             <field name="start_char">29</field>
             <field name="end_char">40</field>
             <field name="entity_id" ref="ner_entity_news_location"/>
@@ -108,7 +108,7 @@
             <field name="model_id" ref="ner_model_news_analyzer"/>
             <field name="text_index">4</field>
         </record>
-        <record id="annotation_14" model="ner.annotation">
+        <record id="annotation_14" model="adb_ner.annotation">
             <field name="start_char">44</field>
             <field name="end_char">60</field>
             <field name="entity_id" ref="ner_entity_news_date"/>

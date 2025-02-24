@@ -2,7 +2,7 @@
 <odoo>
     <record id="view_ner_report_tree" model="ir.ui.view">
         <field name="name">ner.report.tree</field>
-        <field name="model">ner.report</field>
+        <field name="model">adb_ner.report</field>
         <field name="arch" type="xml">
             <tree decoration-info="state == 'draft'"
                   decoration-warning="state == 'in_progress'"

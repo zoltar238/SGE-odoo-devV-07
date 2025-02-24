@@ -9,13 +9,13 @@ from odoo.addons.adb_ner.controllers.ner_controller import NerController
 
 
 class NerDataset(models.Model):
-    _name = "ner.dataset"
+    _name = "adb_ner.dataset"
     _description = "NER Training Dataset"
 
     name = fields.Char(string="Dataset Name", required=True)
     text_list = fields.Json(string="Lista de textos", required=True)
-    annotations = fields.One2many("ner.annotation", "dataset_id", string="Annotations")
-    model_ids = fields.Many2many("ner.model", "ner_model_dataset_rel", "dataset_id", "model_id", string="Models",
+    annotations = fields.One2many("adb_ner.annotation", "dataset_id", string="Annotations")
+    model_ids = fields.Many2many("adb_ner.model", "ner_model_dataset_rel", "dataset_id", "model_id", string="Models",
                                  required=True)
     wipe_punctuation = fields.Boolean(string="Wipe punctuation signs", default=True)
     wipe_numbers = fields.Boolean(string="Wipe numbers", default=True)

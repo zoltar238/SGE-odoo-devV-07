@@ -7,7 +7,7 @@ import traceback
 
 
 class NerModel(models.Model):
-    _name = 'ner.model'
+    _name = 'adb_ner.model'
     _description = 'NER Model'
 
     name = fields.Char(string="Model Name", required=True)

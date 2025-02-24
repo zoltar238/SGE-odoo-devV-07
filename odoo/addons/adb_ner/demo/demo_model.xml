@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <data noupdate="1">
-        <record id="ner_model_news_analyzer" model="ner.model">
+        <record id="ner_model_news_analyzer" model="adb_ner.model">
             <field name="name">News analyzer</field>
             <field name="description">NER model destined to analyze information inside news</field>
             <field name="language">en</field>

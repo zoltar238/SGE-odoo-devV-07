@@ -2,7 +2,7 @@
 <odoo>
     <record id="view_ner_model_tree" model="ir.ui.view">
         <field name="name">ner.model.tree</field>
-        <field name="model">ner.model</field>
+        <field name="model">adb_ner.model</field>
         <field name="arch" type="xml">
             <tree>
                 <field name="name"/>
