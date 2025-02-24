@@ -5,11 +5,6 @@
         <field name="model">adb_ner.annotation</field>
         <field name="arch" type="xml">
             <kanban default_group_by="dataset_id" clickable="True">
-                <header>
-                    <button type="object" class="btn btn-primary btn-lg shadow-sm w-100" name="action_on_button_click">
-                        <i class="fa fa-rocket me-2"></i> Train with this dataset
-                    </button>
-                </header>
                 <templates>
                     <t t-name="kanban-box">
                         <div class="oe_kanban_card shadow-sm rounded-3 border-0 m-2" t-att-record-id="record.id.raw" draggable="False">
@@ -21,7 +16,7 @@
                                             <field name="entity_id"/>
                                         </span>
                                         <span class="badge rounded-pill bg-info">
-                                            <i class="fa fa-hashtag me-1"></i>
+                                            <i class="fa fa-hashtag me-1" title="ID"/>
                                             <field name="text_index"/>
                                         </span>
                                     </div>
@@ -61,7 +56,7 @@
                                 </div>
                             </div>
                             <footer class="oe_kanban_footer p-2 bg-light border-top">
-                                <button type="object" class="btn btn-primary btn-sm w-100 shadow-sm" name="action_on_button_click">
+                                <button type="object" class="btn btn-primary btn-sm w-100 shadow-sm" name="button_train_ner_model">
                                     <i class="fa fa-cogs me-2"></i>Train with this dataset
                                 </button>
                             </footer>

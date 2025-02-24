@@ -28,10 +28,10 @@
                             <div class="d-flex align-items-center bg-light rounded p-3 border" style="gap: 1rem;">
                                 <div class="o_stat_info">
                                     <field name="action_type" invisible="1"/>
-                                    <span class="fa fa-2x fa-graduation-cap" groups="base.group_no_one" invisible="action_type != 'training'"/>
-                                    <span class="fa fa-2x fa-search" groups="base.group_no_one" invisible="action_type != 'detection'"/>
-                                    <span class="fa fa-2x fa-trash" groups="base.group_no_one" invisible="action_type != 'deletion'"/>
-                                    <span class="fa fa-2x fa-plus-circle" groups="base.group_no_one" invisible="action_type != 'creation'"/>
+                                    <span class="fa fa-2x fa-graduation-cap" title="Training Report" groups="base.group_no_one" invisible="action_type != 'training'"/>
+                                    <span class="fa fa-2x fa-search" title="Detection Report" groups="base.group_no_one" invisible="action_type != 'detection'"/>
+                                    <span class="fa fa-2x fa-trash" title="Deletion Report" groups="base.group_no_one" invisible="action_type != 'deletion'"/>
+                                    <span class="fa fa-2x fa-plus-circle" title="Creation Report" groups="base.group_no_one" invisible="action_type != 'creation'"/>
                                 </div>
                                 <field name="action_type" 
                                        widget="selection"

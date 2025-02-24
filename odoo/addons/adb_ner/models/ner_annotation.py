@@ -65,7 +65,7 @@ class NerAnnotation(models.Model):
                 record.text_content = f'\"{text[record.start_char:len(text)]}\" (Out of bounds by {record.end_char - len(text)} characters)'
                 record.faulty_tokens = True
 
-    def action_on_button_click(self):
+    def button_train_ner_model(self):
         # Declare global variables to store the current model name and start time
         global current_model_name, start_time
 
@@ -127,14 +127,14 @@ class NerAnnotation(models.Model):
                 start_time = fields.Datetime.now()
                 current_model_name = annotations_group[0]['model']
                 # Search for entity labels and model information
-                entity_labels = self.env['ner.entity'].search([('model_id.name', '=', current_model_name)])
-                entity_model = self.env['ner.model'].search([('name', '=', current_model_name)], limit=1)
+                entity_labels = self.env['adb_ner.entity'].search([('model_id.name', '=', current_model_name)])
+                entity_model = self.env['adb_ner.model'].search([('name', '=', current_model_name)], limit=1)
                 labels = [entity.name for entity in entity_labels]
                 # Construct the model path
                 joined_model_path = os.path.join(''.join(entity_model.containing_folder), current_model_name)
                 # Initialize the NER controller
                 ner = NerController(joined_model_path, language, labels, None, learn_rate, iterations, batch_size, annotations_group)
-                model = self.env['ner.model'].search([('name', '=', entity_model.name)], limit=1)
+                model = self.env['adb_ner.model'].search([('name', '=', entity_model.name)], limit=1)
 
                 # Train or create the NER model based on the existence of the model path
                 if os.path.exists(joined_model_path):
@@ -189,4 +189,4 @@ class NerAnnotation(models.Model):
             },
             'notes': notes
         }
-        self.env['ner.report'].create_new_report(vals)
+        self.env['adb_ner.report'].create_new_report(vals)

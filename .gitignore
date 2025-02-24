@@ -5,8 +5,7 @@ __pycache__/
 *$py.class
 
 # Ignore ner models
-NER/*
-
+odoo/addons/adb_ner/static/ner*
 # Backups and sql dump files
 *.sql
 *.tgz

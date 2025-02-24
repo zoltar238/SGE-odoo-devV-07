@@ -127,11 +127,12 @@ class NerReport(models.Model):
             else:
                 record.duration = 0.0
 
-    @api.model
-    def create(self, vals):
-        if vals.get('reference', 'New') == 'New':
-            vals['reference'] = self.env['ir.sequence'].next_by_code('ner.report') or 'New'
-        return super(NerReport, self).create(vals)
+    @api.model_create_multi
+    def create(self, vals_list):
+        for vals in vals_list:
+            if vals.get('reference', 'New') == 'New':
+                vals['reference'] = self.env['ir.sequence'].next_by_code('ner.report') or 'New'
+        return super(NerReport, self).create(vals_list)
 
     def action_complete(self):
         self.write({
