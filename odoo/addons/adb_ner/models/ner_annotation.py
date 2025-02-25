@@ -12,20 +12,59 @@ class NerAnnotation(models.Model):
     _name = "adb_ner.annotation"
     _description = "NER Annotation"
 
-    start_char = fields.Integer(string="Start Character", required=True)
-    end_char = fields.Integer(string="End Character", required=True)
-    entity_id = fields.Many2one("adb_ner.entity", string="Entity", required=True, ondelete="cascade")
-    dataset_id = fields.Many2one("adb_ner.dataset", string="Dataset", required=True, ondelete="cascade")
-    model_id = fields.Many2one("adb_ner.model", string="Model", required=True, ondelete="cascade")
+    start_char = fields.Integer(
+        string="Start Character",
+        required=True,
+        help='Start character of the annotation')
+
+    end_char = fields.Integer(
+        string="End Character",
+        required=True,
+        help='End character of the annotation')
+
+    entity_id = fields.Many2one(
+        "adb_ner.entity",
+        string="Entity",
+        required=True,
+        ondelete="cascade",
+        help='Entity associated to this annotation')
+
+    dataset_id = fields.Many2one(
+        "adb_ner.dataset",
+        string="Dataset",
+        required=True,
+        ondelete="cascade",
+        help='Dataset associated to this annotation')
+
+    model_id = fields.Many2one(
+        "adb_ner.model",
+        string="Model",
+        required=True,
+        ondelete="cascade",
+        help='NER model that will train with this annotation')
+
     text_index = fields.Integer(
         string="Text Index",
         required=True,
         default=1,
-        help="Índice del texto en la lista de textos del dataset"
+        help="Text index from the dataset"
     )
-    text_content = fields.Text(string="Text Content", compute='_compute_text_content')
-    trained = fields.Boolean(string="Trained", default=False)
-    faulty_tokens = fields.Boolean(default=False, readonly=True)
+
+    text_content = fields.Text(
+        string="Text Content",
+        compute='_compute_text_content',
+        help='Extracted annotation from the data given')
+
+    trained = fields.Boolean(
+        string="Trained",
+        default=False,
+        help='''Marks whether this annotation has already been used for training.
+        Although it can be overridden, is not recommended to retrain annotations''')
+
+    faulty_tokens = fields.Boolean(
+        default=False,
+        readonly=True,
+        help='Marks whether the selected text is a valid token')
 
     @api.depends('dataset_id.text_list', 'text_index', 'start_char', 'end_char')
     def _compute_text_content(self):
