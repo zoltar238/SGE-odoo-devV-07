@@ -22,7 +22,6 @@ class NerReport(models.Model):
         ('training', 'Model Training'),
         ('creation', 'Model Created'),
         ('detection', 'Entities detected'),
-        ('deletion', 'Model deleted')
     ], string='Action Type', required=True)
 
     state = fields.Selection([
