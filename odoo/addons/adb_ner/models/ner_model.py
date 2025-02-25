@@ -1,61 +1,51 @@
 from odoo.exceptions import ValidationError
 
 from odoo import fields, models
-from odoo.addons.adb_ner.controllers.ner_controller import NerController
-import os
-import traceback
 
 
 class NerModel(models.Model):
     _name = 'adb_ner.model'
     _description = 'NER Model'
 
-    name = fields.Char(string="Model Name", required=True)
-    description = fields.Text(string="Description")
+    name = fields.Char(
+        string="Model Name",
+        required=True,
+        help="This is the unique name of your model",
+    )
+
+    description = fields.Text(
+        string="Description",
+        help="Description of your model")
+
     language = fields.Selection([
         ('en', 'English'),
         ('es', 'Spanish')
-    ], string="Language", default='en', required=True)
-    containing_folder = fields.Char(string="Folder containing this model", required=True, default="var/lib/NER")
-    active = fields.Boolean(string="Active", default=True)
-    created = fields.Boolean(string="Created", default=False, readonly=True)
+    ],
+        string="Language",
+        default='en',
+        required=True,
+        help="Language of your model")
 
+    containing_folder = fields.Char(
+        string="Folder containing this model",
+        required=True,
+        default="var/lib/NER",
+        help='The path containing your model will be this_folder + /your_model_name')
 
-    def action_delete_model(self):
-        ner = NerController(self.containing_folder)
-        try:
-            deletion = ner.delete_ner_model()
-            # Delete model from database
-            if not self.exists():
-                raise ValidationError("Model does not exist")
+    active = fields.Boolean(
+        string="Active",
+        default=True,
+        help='Activate or deactivate this model')
 
-            self.unlink()
-            # Generate report
-            self._create_report(self.name, deletion, 'Model successfully deleted')
-            return {
-                'type': 'ir.actions.client',
-                'tag': 'display_notification',
-                'params': {
-                    'title': "Success",
-                    'message': "All model data has been deleted successfully",
-                    'sticky': False,
-                }
-            }
-        except Exception:
-            # Capture the error and generate error report
-            error_trace = traceback.format_exc()
-            self._create_report(self.name, error_trace, 'Error deleting model', error=True)
-            raise ValidationError(f"Error deleting model: {error_trace}")
+    created = fields.Boolean(
+        string="Created",
+        default=False,
+        readonly=True,
+        help='''Mark whether the model has benn created. 
+        When deleting a created model make sure to also delete its files''')
 
+    # Ensure model name is unique
+    _sql_constraints =[
+        ('unique_name', 'unique(name)', 'A NER model with this name already exists, model names must be unique')
+    ]
 
-    def _create_report(self, model_name, log, notes, error=False):
-        vals = {
-            'reference': f'DELETION {model_name}|{fields.Datetime.now()}',
-            'action_type': 'deletion',
-            'state': 'failed' if error else 'completed',
-            'start_time': fields.Datetime.now(),
-            'end_time': fields.Datetime.now(),
-            'log': log,
-            'notes': notes
-        }
-        self.env['adb_ner.report'].create(vals)
