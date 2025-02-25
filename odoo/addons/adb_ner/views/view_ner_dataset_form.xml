@@ -47,7 +47,6 @@
                         <page string="Detected Annotations" name="annotations">
                             <field name="annotations">
                                 <tree editable="bottom" decoration-info="trained==False">
-                                    <field name="dataset_id" invisible="1"/>
                                     <field name="model_id" domain="[('id', 'in', parent.model_ids)]"/>
                                     <field name="text_index"/>
                                     <field name="text_content" readonly="1"/>
