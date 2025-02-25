@@ -6,6 +6,8 @@ __pycache__/
 
 # Ignore ner models
 odoo/addons/adb_ner/static/ner*
+!odoo/addons/adb_ner/static/ner/
+
 # Backups and sql dump files
 *.sql
 *.tgz
