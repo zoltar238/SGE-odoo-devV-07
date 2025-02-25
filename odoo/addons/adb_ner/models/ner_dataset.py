@@ -95,8 +95,12 @@ class NerDataset(models.Model):
                 results = ner.analyze_data()
                 model_entities = 0
 
+                # Process results
                 for result in results:
-                    analyzed_lines += 1
+                    # If the model has detected any results update number of analyzed lines
+                    if result['text']:
+                        analyzed_lines += 1
+
                     for entity in result['entities']:
                         total_entities += 1
                         model_entities += 1
