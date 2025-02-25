@@ -18,8 +18,6 @@
                             <field name="description"/>
                         </group>
                     </group>
-                    <button name="action_delete_model" type="object" class="btn btn-danger"
-                            string="Delete Model" confirm="Are you sure you want to delete this model? This action will delete this NER model from the database and all it´s files"/>
                 </sheet>
             </form>
         </field>
