@@ -34,6 +34,7 @@ class NerAnnotation(models.Model):
         string="Dataset",
         required=True,
         ondelete="cascade",
+        readlonly=True,
         help='Dataset associated to this annotation')
 
     model_id = fields.Many2one(

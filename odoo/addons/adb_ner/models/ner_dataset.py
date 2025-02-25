@@ -46,7 +46,10 @@ class NerDataset(models.Model):
         string="Wipe numbers",
         default=False,
         help='If checked, numeric values will be removed when sanitizing data')
-    image = fields.Image(string="Dataset image")
+
+    image = fields.Image(
+        string="Dataset image",
+        help='Image that represents this dataset')
 
     # Function that sanitices data on this dataset
     def button_data_sanitizer(self):
