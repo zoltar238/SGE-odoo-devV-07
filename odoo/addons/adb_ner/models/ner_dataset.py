@@ -40,15 +40,11 @@ class NerDataset(models.Model):
     wipe_punctuation = fields.Boolean(
         string="Wipe punctuation signs",
         default=False,
-        # Reset value to false when reopening model
-        store=False,
         help='If checked, punctuation signs will be removed when sanitizing data')
 
     wipe_numbers = fields.Boolean(
         string="Wipe numbers",
         default=False,
-        # Reset value to false when reopening model
-        store=False,
         help='If checked, numeric values will be removed when sanitizing data')
     image = fields.Image(string="Dataset image")
 
