@@ -12,34 +12,67 @@ class NerDataset(models.Model):
     _name = "adb_ner.dataset"
     _description = "NER Training Dataset"
 
-    name = fields.Char(string="Dataset Name", required=True)
-    text_list = fields.Json(string="Lista de textos", required=True)
-    annotations = fields.One2many("adb_ner.annotation", "dataset_id", string="Annotations")
-    model_ids = fields.Many2many("adb_ner.model", "ner_model_dataset_rel", "dataset_id", "model_id", string="Models",
-                                 required=True)
-    wipe_punctuation = fields.Boolean(string="Wipe punctuation signs", default=True)
-    wipe_numbers = fields.Boolean(string="Wipe numbers", default=True)
+    name = fields.Char(
+        string="Dataset Name",
+        required=True,
+        help='Name that identifies this dataset')
+
+    text_list = fields.Json(
+        string="Lista de textos",
+        required=True,
+        help='Data to be analyzed line by line')
+
+    annotations = fields.One2many(
+        "adb_ner.annotation",
+        "dataset_id",
+        string="Annotations",
+        help='Annotations found in this dataset')
+
+    model_ids = fields.Many2many(
+        "adb_ner.model",
+        "ner_model_dataset_rel",
+        "dataset_id",
+        "model_id",
+        string="Models",
+        required=True,
+        help='Models that will analyze this data')
+
+    wipe_punctuation = fields.Boolean(
+        string="Wipe punctuation signs",
+        default=False,
+        # Reset value to false when reopening model
+        store=False,
+        help='If checked, punctuation signs will be removed when sanitizing data')
+
+    wipe_numbers = fields.Boolean(
+        string="Wipe numbers",
+        default=False,
+        # Reset value to false when reopening model
+        store=False,
+        help='If checked, numeric values will be removed when sanitizing data')
     image = fields.Image(string="Dataset image")
 
+    # Function that sanitices data on this dataset
     def button_data_sanitizer(self):
-        for rec in self:
-            if rec.text_list:
-                # Split the text into a list
-                data_list = rec.text_list.split('\n')
+        if self.text_list:
+            # Split the text into a list
+            data_list = self.text_list.split('\n')
 
-                # Sanitize the list
-                if rec.wipe_punctuation or rec.wipe_numbers:
-                    sanitized_data = english_data_sanitizer(data_list, rec.wipe_punctuation, rec.wipe_numbers)
+            # Sanitize the list
+            if self.wipe_punctuation or self.wipe_numbers:
+                sanitized_data = english_data_sanitizer(data_list, self.wipe_punctuation, self.wipe_numbers)
 
-                    # Save the sanitized list
-                    result_data = ''
-                    for data in sanitized_data:
-                        result_data += data + '\n'
+                # Save the sanitized list
+                result_data = ''
+                for data in sanitized_data:
+                    result_data += data + '\n'
 
-                    rec.text_list = result_data.strip()
+                self.text_list = result_data.strip()
 
+    # Function to extract entities from data
     def button_detect_entities(self):
         global start_time
+
         # Split text into list
         data_list = []
         text_list = self.text_list.split('\n')
