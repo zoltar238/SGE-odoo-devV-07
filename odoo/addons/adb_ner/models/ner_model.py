@@ -26,6 +26,9 @@ class NerModel(models.Model):
         try:
             deletion = ner.delete_ner_model()
             # Delete model from database
+            if not self.exists():
+                raise ValidationError("Model does not exist")
+
             self.unlink()
             # Generate report
             self._create_report(self.name, deletion, 'Model successfully deleted')
@@ -55,4 +58,4 @@ class NerModel(models.Model):
             'log': log,
             'notes': notes
         }
-        self.env['ner.report'].create(vals)
+        self.env['adb_ner.report'].create(vals)

@@ -70,10 +70,10 @@ class NerDataset(models.Model):
                         model_entities += 1
                         # Get all necessary elements
                         start_char, end_char, entity_label, entity_text = entity
-                        entity_record = self.env['ner.entity'].search([('name', '=', entity_label)], limit=1)
+                        entity_record = self.env['adb_ner.entity'].search([('name', '=', entity_label)], limit=1)
 
                         # Check if a model with the same data already exist
-                        existing_annotation = self.env['ner.annotation'].search([
+                        existing_annotation = self.env['adb_ner.annotation'].search([
                             ('text_index', '=', result['index'] + 1),
                             ('model_id', '=', model.id),
                             ('start_char', '=', start_char),
@@ -95,7 +95,7 @@ class NerDataset(models.Model):
                                 'dataset_id': self.id
                             }
                             # Create the new model
-                            self.env['ner.annotation'].create(annotation_vals)
+                            self.env['adb_ner.annotation'].create(annotation_vals)
                 
                 # Create report with detection statistics
                 report_data = {
@@ -147,4 +147,4 @@ Detection Summary:
             'log': json.dumps(results, indent=4),
             'notes': 'Error detecting data' if error else 'Data detected successfully'
         }
-        self.env['ner.report'].create(new_report)
+        self.env['adb_ner.report'].create(new_report)

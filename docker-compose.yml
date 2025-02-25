@@ -34,7 +34,7 @@ services:
       - odoo_log:/var/log/odoo/
       - odoo_data:/var/lib/odoo
       # volumen para los modelos NER
-      - ./odoo/addons/adb_ner/NER:/var/lib/NER
+      - ./odoo/addons/adb_ner/static/ner:/var/lib/NER
 
   pgadmin:
     image: dpage/pgadmin4:latest
