@@ -116,5 +116,30 @@
             <field name="model_id" ref="ner_model_news_analyzer"/>
             <field name="text_index">4</field>
         </record>
+
+        <record id="annotation_1" model="adb_ner.annotation">
+            <field name="start_char">0</field>
+            <field name="end_char">8</field>
+            <field name="entity_id" ref="ner_entity_news_person"/>
+            <field name="dataset_id" ref="ner_dataset_news"/>
+            <field name="model_id" ref="ner_model_news_analyzer_variation"/>
+            <field name="text_index">1</field>
+        </record>
+        <record id="annotation_2" model="adb_ner.annotation">
+            <field name="start_char">18</field>
+            <field name="end_char">24</field>
+            <field name="entity_id" ref="ner_entity_news_org"/>
+            <field name="dataset_id" ref="ner_dataset_news"/>
+            <field name="model_id" ref="ner_model_news_analyzer_variation"/>
+            <field name="text_index">1</field>
+        </record>
+        <record id="annotation_3" model="adb_ner.annotation">
+            <field name="start_char">38</field>
+            <field name="end_char">46</field>
+            <field name="entity_id" ref="ner_entity_news_location"/>
+            <field name="dataset_id" ref="ner_dataset_news"/>
+            <field name="model_id" ref="ner_model_news_analyzer_variation"/>
+            <field name="text_index">1</field>
+        </record>
     </data>
 </odoo>

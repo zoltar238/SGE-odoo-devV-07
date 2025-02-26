@@ -24,7 +24,7 @@ Shakespeare was born in April 1564 in England
 The World Health Organization (WHO) was founded in 1948
 IBM was established in 1911 and is a pioneer in computing
 The Golden Gate Bridge is an iconic landmark in San Francisco</field>
-            <field name="model_ids" eval="[(6, 0, [ref('ner_model_news_analyzer')])]"/>
+            <field name="model_ids" eval="[(6, 0, [ref('ner_model_news_analyzer'), ref('ner_model_news_analyzer_variation')])]"/>
         </record>
     </data>
 </odoo>

@@ -4,22 +4,22 @@
         <record id="ner_entity_news_person" model="adb_ner.entity">
             <field name="name">PERSON</field>
             <field name="entity_type">person</field>
-            <field name="model_id" eval="[(6, 0, [ref('ner_model_news_analyzer')])]"/>
+            <field name="model_id" eval="[(6, 0, [ref('ner_model_news_analyzer'), ref('ner_model_news_analyzer_variation')])]"/>
         </record>
         <record id="ner_entity_news_org" model="adb_ner.entity">
             <field name="name">ORG</field>
             <field name="entity_type">organization</field>
-            <field name="model_id" eval="[(6, 0, [ref('ner_model_news_analyzer')])]"/>
+            <field name="model_id" eval="[(6, 0, [ref('ner_model_news_analyzer'), ref('ner_model_news_analyzer_variation')])]"/>
         </record>
         <record id="ner_entity_news_location" model="adb_ner.entity">
             <field name="name">LOC</field>
             <field name="entity_type">location</field>
-            <field name="model_id" eval="[(6, 0, [ref('ner_model_news_analyzer')])]"/>
+            <field name="model_id" eval="[(6, 0, [ref('ner_model_news_analyzer'), ref('ner_model_news_analyzer_variation')])]"/>
         </record>
         <record id="ner_entity_news_date" model="adb_ner.entity">
             <field name="name">DATE</field>
             <field name="entity_type">date</field>
-            <field name="model_id" eval="[(6, 0, [ref('ner_model_news_analyzer')])]"/>
+            <field name="model_id" eval="[(6, 0, [ref('ner_model_news_analyzer'), ref('ner_model_news_analyzer_variation')])]"/>
         </record>
     </data>
 </odoo>
