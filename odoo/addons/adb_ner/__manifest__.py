@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+
+
 {
     'name': "NER (Named Entity Recognition)",
 
@@ -49,7 +51,6 @@ including dataset handling, entity annotation, and model evaluation.
         'demo/demo_dataset.xml',
         'demo/demo_annotation.xml',
     ],
-
 
     'installable': True,
     'application': True,
