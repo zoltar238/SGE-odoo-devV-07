@@ -86,10 +86,12 @@ class NerDataset(models.Model):
             total_entities = 0
             new_annotations = 0
             analyzed_lines = 0
-            
+
+            # Set start time for the detection process
             start_time = fields.Datetime.now()
+
+            # Get the model path and check if it exists before using it
             path = os.path.join(model.containing_folder, model.name)
-            # Check if NER model exits before using it
             if os.path.exists(path):
                 ner = NerController(model_path=path, data_list=data_list)
                 results = ner.analyze_data()
@@ -147,7 +149,6 @@ class NerDataset(models.Model):
                     }
                 }
                 self._create_report(model.name, start_time, report_data)
-
 
             # If model could not be found
             else:
