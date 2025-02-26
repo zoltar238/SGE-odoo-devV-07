@@ -68,7 +68,7 @@ class NerReport(models.Model):
         group_operator='avg'
     )
 
-    # Campos de tiempo
+    # Time tracking
     start_time = fields.Datetime(
         string='Start Time',
         default=fields.Datetime.now
@@ -85,7 +85,7 @@ class NerReport(models.Model):
         group_operator='avg'
     )
 
-    # Campos relacionales
+    # Relations
     user_id = fields.Many2one(
         'res.users',
         string='User',
@@ -105,6 +105,7 @@ class NerReport(models.Model):
         readonly=True
     )
 
+    # Auto computed success rate
     @api.depends('success_count', 'record_count')
     def _compute_success_rate(self):
         for record in self:
@@ -117,6 +118,7 @@ class NerReport(models.Model):
             else:
                 record.success_rate = 100.0
 
+    # Auto computed duration
     @api.depends('start_time', 'end_time')
     def _compute_duration(self):
         for record in self:
@@ -126,6 +128,7 @@ class NerReport(models.Model):
             else:
                 record.duration = 0.0
 
+    # Auto generated reference
     @api.model_create_multi
     def create(self, vals_list):
         for vals in vals_list:
@@ -133,12 +136,14 @@ class NerReport(models.Model):
                 vals['reference'] = self.env['ir.sequence'].next_by_code('ner.report') or 'New'
         return super(NerReport, self).create(vals_list)
 
+    # Actin to complete the report
     def action_complete(self):
         self.write({
             'state': 'completed',
             'end_time': fields.Datetime.now()
         })
 
+    # Action to fail the report
     def action_fail(self):
         self.write({
             'state': 'failed',
