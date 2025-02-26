@@ -1,3 +1,5 @@
+from fnmatch import translate
+
 from odoo.exceptions import ValidationError
 
 from odoo import fields, models
@@ -10,6 +12,7 @@ class NerModel(models.Model):
     name = fields.Char(
         string="Model Name",
         required=True,
+        translate=True,
         help="This is the unique name of your model",
     )
 
