@@ -160,7 +160,7 @@ class NerDataset(models.Model):
             'params': {
                 'title': "Detection Completed Successfully",
                 'message': "Data has been detected successfully",
-                'sticky': True,
+                'sticky': False,
                 'type': 'success'
             }
         }
