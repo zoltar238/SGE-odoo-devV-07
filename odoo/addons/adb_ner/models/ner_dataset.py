@@ -98,8 +98,11 @@ class NerDataset(models.Model):
                 # Process results
                 for result in results:
                     # If the model has detected any results update number of analyzed lines
-                    if result['text']:
+                    if result['entities']:
                         analyzed_lines += 1
+                    # skip this iteration if no entities were found
+                    else:
+                        continue
 
                     for entity in result['entities']:
                         total_entities += 1
@@ -132,7 +135,7 @@ class NerDataset(models.Model):
                             }
                             # Create the new model
                             self.env['adb_ner.annotation'].create(annotation_vals)
-                
+
                 # Create report with detection statistics
                 report_data = {
                     'results': results,
@@ -145,28 +148,24 @@ class NerDataset(models.Model):
                 }
                 self._create_report(model.name, start_time, report_data)
 
+
             # If model could not be found
             else:
                 self._create_report(model.name, start_time, 'Null', error=True)
                 raise ValidationError(f'NER model {model.name} not found')
-
-        # Show message of success if nothing fails
+                # If everything was ok, return a success message
         return {
             'type': 'ir.actions.client',
             'tag': 'display_notification',
             'params': {
-                'title': "✅ Detection Completed Successfully",
-                'message': f"""
-Detection Summary:
-• Total lines processed: {total_lines}
-• Lines successfully analyzed: {analyzed_lines}
-• Total entities found: {total_entities}
-• New annotations created: {new_annotations}
-""",
+                'title': "Detection Completed Successfully",
+                'message': "Data has been detected successfully",
                 'sticky': True,
                 'type': 'success'
             }
         }
+
+
 
     def _create_report(self, model_name, start_time, results, error=False):
         # Create result summary and report
