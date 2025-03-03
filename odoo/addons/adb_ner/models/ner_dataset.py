@@ -6,6 +6,7 @@ from odoo.exceptions import ValidationError, UserError
 from odoo import api, fields, models
 from odoo.addons.adb_ner.controllers.data_controller import english_data_sanitizer
 from odoo.addons.adb_ner.controllers.ner_controller import NerController
+from odoo.addons.adb_ner.controllers.notification_controller import create_notification
 
 
 class NerDataset(models.Model):
@@ -113,7 +114,7 @@ class NerDataset(models.Model):
                         start_char, end_char, entity_label, entity_text = entity
                         entity_record = self.env['adb_ner.entity'].search([('name', '=', entity_label)], limit=1)
 
-                        # Check if a model with the same data already exist
+                        # Check if a model with the same data already exists
                         existing_annotation = self.env['adb_ner.annotation'].search([
                             ('text_index', '=', result['index'] + 1),
                             ('model_id', '=', model.id),
@@ -154,21 +155,16 @@ class NerDataset(models.Model):
             else:
                 self._create_report(model.name, start_time, 'Null', error=True)
                 raise ValidationError(f'NER model {model.name} not found')
-                # If everything was ok, return a success message
-        return {
-            'type': 'ir.actions.client',
-            'tag': 'display_notification',
-            'params': {
-                'title': "Detection Completed Successfully",
-                'message': "Data has been detected successfully",
-                'sticky': False,
-                'type': 'success'
-            }
-        }
 
+        # If everything was ok, return a success message
+        return create_notification(
+            "Detection Completed Successfully",
+            "Data has been detected successfully, check the reports for more information",
+            False,
+            'success'
+        )
 
-
-    def _create_report(self, model_name, start_time, results, error=False):
+    def _create_report(self, model_name, beginning, results, error=False):
         # Create result summary and report
         new_report = {
             'reference': f'DETECTION {model_name}|{fields.Datetime.now()}',
@@ -178,7 +174,7 @@ class NerDataset(models.Model):
             'success_count': results['stats']['analyzed_lines'],
             'entities_count': results['stats']['total_entities'],
             'annotations_created': results['stats']['new_annotations'],
-            'start_time': start_time,
+            'start_time': beginning,
             'end_time': fields.Datetime.now(),
             'log': json.dumps(results, indent=4),
             'notes': 'Error detecting data' if error else 'Data detected successfully'
