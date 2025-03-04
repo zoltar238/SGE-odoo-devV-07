@@ -224,7 +224,7 @@ class NerAnnotation(models.Model):
 
                 # Create a training report
                 self._create_report('training', current_model_name, start_time, 'NER model training',
-                                    'Data trained successfully', iterations, training_results, len(annotation_list))
+                                    'Data trained successfully', iterations, training_results, len(annotations))
 
             # Return a success notification
             return create_notification(
