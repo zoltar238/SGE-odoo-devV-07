@@ -8,6 +8,8 @@ __pycache__/
 odoo/addons/adb_ner/static/ner*
 !odoo/addons/adb_ner/static/ner/
 
+.idea/
+
 # Backups and sql dump files
 *.sql
 *.tgz
