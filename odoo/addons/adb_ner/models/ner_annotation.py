@@ -6,6 +6,7 @@ from odoo.exceptions import ValidationError, UserError
 
 from odoo import api, fields, models
 from odoo.addons.adb_ner.controllers.ner_controller import NerController
+from odoo.addons.adb_ner.controllers.notification_controller import create_notification
 
 
 class NerAnnotation(models.Model):
@@ -223,7 +224,7 @@ class NerAnnotation(models.Model):
 
                 # Create a training report
                 self._create_report('training', current_model_name, start_time, 'NER model training',
-                                    'Data trained successfully', iterations, training_results, len(sorted_annotations))
+                                    'Data trained successfully', iterations, training_results, len(annotation_list))
 
             # Return a success notification
             return create_notification(

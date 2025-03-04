@@ -1,8 +1,6 @@
 import json
 import os.path
 
-from odoo.exceptions import ValidationError, UserError
-
 from odoo import api, fields, models
 from odoo.addons.adb_ner.controllers.data_controller import english_data_sanitizer
 from odoo.addons.adb_ner.controllers.ner_controller import NerController
@@ -139,7 +137,7 @@ class NerDataset(models.Model):
                             # Create the new model
                             self.env['adb_ner.annotation'].create(annotation_vals)
 
-                # Create report with detection statistics
+                # Create a report with detection statistics
                 report_data = {
                     'results': results,
                     'stats': {
@@ -154,7 +152,12 @@ class NerDataset(models.Model):
             # If model could not be found
             else:
                 self._create_report(model.name, start_time, 'Null', error=True)
-                raise ValidationError(f'NER model {model.name} not found')
+                return create_notification(
+                    "Detection failed",
+                    f"NER model {model.name} not found, check the reports for more information",
+                    False,
+                    'error'
+                )
 
         # If everything was ok, return a success message
         return create_notification(
@@ -170,10 +173,10 @@ class NerDataset(models.Model):
             'reference': f'DETECTION {model_name}|{fields.Datetime.now()}',
             'action_type': 'detection',
             'state': 'failed' if error else 'completed',
-            'record_count': results['stats']['total_lines'],
-            'success_count': results['stats']['analyzed_lines'],
-            'entities_count': results['stats']['total_entities'],
-            'annotations_created': results['stats']['new_annotations'],
+            'record_count': results['stats']['total_lines'] if results != 'Null' else 0,
+            'success_count': results['stats']['analyzed_lines'] if results != 'Null' else 0,
+            'entities_count': results['stats']['total_entities'] if results != 'Null' else 0,
+            'annotations_created': results['stats']['new_annotations'] if results != 'Null' else 0,
             'start_time': beginning,
             'end_time': fields.Datetime.now(),
             'log': json.dumps(results, indent=4),
